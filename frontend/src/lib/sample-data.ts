@@ -6,7 +6,7 @@ export const sampleRecipes: Recipe[] = [
     title: "Creamy Tomato Pasta",
     description: "One-pan weeknight pasta in 25 minutes.",
     steps: ["Boil the pasta", "Make the sauce", "Combine and serve"],
-    imageUrl: "https://images.unsplash.com/photo-1551183053-bf91a1d81141",
+    imageUrl: "https://images.unsplash.com/photo-1551183053-bf91a1d81141?auto=format&fit=crop&w=600&q=80",
     isGlobal: true,
     category: "Dinner",
     difficulty: "Easy",
@@ -30,7 +30,7 @@ export const sampleRecipes: Recipe[] = [
       "Poach the eggs in simmering water with a splash of vinegar for 3 minutes.",
       "Assemble toast and season with red pepper flakes."
     ],
-    imageUrl: "https://images.unsplash.com/photo-1525351484163-7529414344d8",
+    imageUrl: "https://images.unsplash.com/photo-1525351484163-7529414344d8?auto=format&fit=crop&w=600&q=80",
     isGlobal: true,
     category: "Breakfast",
     difficulty: "Easy",
@@ -55,7 +55,7 @@ export const sampleRecipes: Recipe[] = [
       "Prepare sauce with onions, garlic, ginger, spices, tomatoes, and cream.",
       "Simmer chicken in sauce for 15 minutes and garnish with cilantro."
     ],
-    imageUrl: "https://images.unsplash.com/photo-1565557623262-b51c2513a641",
+    imageUrl: "https://images.unsplash.com/photo-1565557623262-b51c2513a641?auto=format&fit=crop&w=600&q=80",
     isGlobal: true,
     category: "Dinner",
     difficulty: "Medium",
@@ -80,7 +80,7 @@ export const sampleRecipes: Recipe[] = [
       "Whisk garlic, anchovy paste, lemon juice, Dijon mustard, egg yolk, and olive oil.",
       "Chop romaine lettuce and toss with dressing, croutons, and shaved Parmesan."
     ],
-    imageUrl: "https://images.unsplash.com/photo-1550304943-4f24f54ddde9",
+    imageUrl: "https://images.unsplash.com/photo-1550304943-4f24f54ddde9?auto=format&fit=crop&w=600&q=80",
     isGlobal: true,
     category: "Lunch",
     difficulty: "Easy",
@@ -105,7 +105,7 @@ export const sampleRecipes: Recipe[] = [
       "Pour in coconut milk, diced tomatoes, and chickpeas. Simmer for 20 minutes.",
       "Stir in fresh spinach until wilted and serve over jasmine rice."
     ],
-    imageUrl: "https://images.unsplash.com/photo-1546833999-b9f581a1996d",
+    imageUrl: "https://images.unsplash.com/photo-1546833999-b9f581a1996d?auto=format&fit=crop&w=600&q=80",
     isGlobal: true,
     category: "Dinner",
     difficulty: "Easy",
@@ -130,7 +130,7 @@ export const sampleRecipes: Recipe[] = [
       "Pour sauce over salmon during the last minute of cooking to glaze.",
       "Serve over cooked sushi rice with steamed broccoli and sesame seeds."
     ],
-    imageUrl: "https://images.unsplash.com/photo-1467003909585-2f8a72700288",
+    imageUrl: "https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=600&q=80",
     isGlobal: true,
     category: "Dinner",
     difficulty: "Medium",
@@ -156,7 +156,7 @@ export const sampleRecipes: Recipe[] = [
       "Fold in fresh blueberries gently.",
       "Cook ladlefuls on a greased griddle over medium heat until bubbly, flip and finish."
     ],
-    imageUrl: "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445",
+    imageUrl: "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?auto=format&fit=crop&w=600&q=80",
     isGlobal: true,
     category: "Breakfast",
     difficulty: "Easy",
@@ -182,7 +182,7 @@ export const sampleRecipes: Recipe[] = [
       "Warm corn tortillas on a dry skillet until pliable.",
       "Fill tortillas with beef, diced onion, fresh cilantro, and a squeeze of lime."
     ],
-    imageUrl: "https://images.unsplash.com/photo-1565299585323-38d6b0865b47",
+    imageUrl: "https://images.unsplash.com/photo-1565299585323-38d6b0865b47?auto=format&fit=crop&w=600&q=80",
     isGlobal: true,
     category: "Dinner",
     difficulty: "Easy",

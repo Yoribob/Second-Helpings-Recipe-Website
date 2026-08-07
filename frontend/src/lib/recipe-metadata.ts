@@ -1,0 +1,50 @@
+export const CATEGORIES = [
+  "Breakfast",
+  "Lunch",
+  "Dinner",
+  "Dessert",
+  "Snack",
+  "Appetizer",
+  "Drink",
+  "Soup",
+  "Salad",
+  "Side Dish",
+  "Main Course",
+] as const;
+
+export const DIFFICULTIES = ["Easy", "Medium", "Hard"] as const;
+export const CUISINES = [
+  "Italian",
+  "Chinese",
+  "Japanese",
+  "Mexican",
+  "Indian",
+  "Thai",
+  "French",
+  "Greek",
+  "American",
+  "Mediterranean",
+  "Korean",
+  "Vietnamese",
+  "Spanish",
+  "Middle Eastern",
+  "Other",
+] as const;
+export const DIETARY_TAGS = [
+  "Vegetarian",
+  "Vegan",
+  "Gluten-Free",
+  "Dairy-Free",
+  "Nut-Free",
+  "Egg-Free",
+  "Soy-Free",
+  "Low-Carb",
+  "Keto",
+  "Paleo",
+  "Halal",
+  "Kosher",
+  "Sugar-Free",
+  "Low-Fat",
+  "High-Protein",
+] as const;
+export const MAX_COOKING_TIME = [15, 30, 60];

@@ -1,9 +1,26 @@
-body{
-    font-size: 18px;
+body {
+  font-size: 18px;
 }
 
 .recipe-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   gap: 16px;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0;
+}
+.chip {
+  padding: 6px 12px;
+  border: 2px solid #e5d5c3;
+  border-radius: 999px;
+  background: transparent;
+  cursor: pointer;
+}
+.chip.active {
+  background: #e5d5c3;
 }
