@@ -1,9 +1,15 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Header } from "@/components/layout/Header";
+import { Footer } from "@/components/layout/Footer";
+import { fontVariables } from "@/lib/fonts";
+
 export const metadata: Metadata = {
-  title: "recipe-app",
-  description: "A recipe website",
+  title: {
+    default: "Second Helpings",
+    template: "%s · Second Helpings",
+  },
+  description: "A cozy place for your recipes.",
 };
 
 export default function RootLayout({
@@ -12,13 +18,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className={fontVariables}>
       <body>
-        <Header
-          appName="recipe-app"
-          links={[{ label: "Browse", href: "/recipes" }]}
-        />
+        <Header />
         <main>{children}</main>
+        <Footer />
       </body>
     </html>
   );

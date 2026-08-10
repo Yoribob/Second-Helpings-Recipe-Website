@@ -1,26 +1,42 @@
+:root {
+  --bay: #1f3325;
+  --bay-light: #2c4530;
+  --saffron: #e0a62b;
+  --cream: #f6f1e3;
+  --sage: #9db89b;
+  --line: rgba(246, 241, 227, 0.14);
+  scrollbar-width: none;
+}
+
+* {
+  box-sizing: border-box;
+}
+
 body {
+  margin: 0;
   font-size: 18px;
+  font-family: var(--font-body);
+  background: var(--cream);
+  color: var(--bay);
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
+}
+
+main {
+  flex: 1;
+  width: 100%;
 }
 
 .recipe-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   gap: 16px;
-}
-
-.chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin: 12px 0;
-}
-.chip {
-  padding: 6px 12px;
-  border: 2px solid #e5d5c3;
-  border-radius: 999px;
-  background: transparent;
-  cursor: pointer;
-}
-.chip.active {
-  background: #e5d5c3;
 }

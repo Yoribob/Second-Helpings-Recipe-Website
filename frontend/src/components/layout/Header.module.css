@@ -1,0 +1,180 @@
+.header {
+  background: var(--bay);
+  color: var(--cream);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  padding: 0 24px;
+}
+
+.inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 24px;
+  padding: 12px 0;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: var(--cream);
+}
+
+.logoMark {
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  background: var(--saffron);
+  color: var(--bay);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.brandName {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  color: var(--saffron);
+}
+
+.nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  padding-right: 140px;
+}
+
+.profile {
+  position: fixed;
+  top: 10px;
+  right: 0;
+  z-index: 110;
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 999px;
+  margin-right: 1.5rem;
+  background: transparent;
+  color: var(--cream);
+  font-size: 0.95rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.profile:hover,
+.profile:focus-visible {
+  background: rgba(246, 241, 227, 0.12);
+  color: var(--saffron);
+  outline: none;
+}
+
+.navItem {
+  position: relative;
+}
+
+.navButton {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--cream);
+  font-size: 0.95rem;
+  font-weight: 500;
+  font-family: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  margin: 0 0.75rem;
+}
+
+.navItem:hover .navButton,
+.navItem:focus-within .navButton,
+.navButton:hover,
+.navButton:focus-visible {
+  background: rgba(246, 241, 227, 0.12);
+  color: var(--saffron);
+  outline: none;
+}
+
+.dropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  min-width: 210px;
+  margin: 0;
+  padding: 8px;
+  list-style: none;
+  background: #fff;
+  color: var(--bay);
+  border-radius: 12px;
+  box-shadow: 0 12px 28px rgba(15, 26, 18, 0.22);
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease,
+    visibility 0s linear 0.15s;
+}
+
+/* bridge the hover gap between the trigger and the panel */
+.dropdown::before {
+  content: "";
+  position: absolute;
+  top: -10px;
+  left: 0;
+  right: 0;
+  height: 10px;
+}
+
+.navItem:hover .dropdown,
+.navItem:focus-within .dropdown {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+  transition-delay: 0s;
+}
+
+.dropdownItem {
+  display: block;
+  padding: 8px 12px;
+  border-radius: 8px;
+  color: var(--bay);
+  font-size: 0.9rem;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.dropdownItem:hover,
+.dropdownItem:focus-visible {
+  background: var(--cream);
+  outline: none;
+}
+
+@media (max-width: 720px) {
+  .inner {
+    justify-content: center;
+  }
+
+  .nav {
+    justify-content: center;
+  }
+}

@@ -1,0 +1,87 @@
+.footer {
+  background: var(--bay);
+  color: var(--cream);
+  padding: 40px 32px 24px;
+}
+
+.footerInner {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.footerTop {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1fr;
+  gap: 40px;
+  padding-bottom: 28px;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: var(--cream);
+}
+
+.logoMark {
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  background: var(--saffron);
+  color: var(--bay);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.brandName {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  color: var(--saffron);
+}
+
+.linkList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.linkList a {
+  color: var(--cream);
+  text-decoration: none;
+  font-size: 0.9rem;
+  opacity: 0.88;
+  transition: opacity 0.15s ease, color 0.15s ease;
+}
+
+.linkList a:hover,
+.linkList a:focus-visible {
+  opacity: 1;
+  color: var(--saffron);
+  outline: none;
+}
+
+.footerBottom {
+  border-top: 1px solid var(--line);
+  padding-top: 16px;
+  font-size: 0.8rem;
+  color: var(--sage);
+  text-align: center;
+}
+
+@media (max-width: 640px) {
+  .footerTop {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .brandBlock {
+    grid-column: 1 / -1;
+  }
+}

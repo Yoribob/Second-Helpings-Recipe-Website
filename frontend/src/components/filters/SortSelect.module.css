@@ -1,0 +1,73 @@
+.root {
+  position: relative;
+}
+
+.trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border: 2px solid #e5d5c3;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--bay);
+  font-size: 0.95rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+
+.trigger:hover,
+.trigger:focus-visible {
+  border-color: var(--saffron);
+  outline: none;
+}
+
+.chevron {
+  color: var(--saffron);
+  transition: transform 0.15s ease;
+}
+
+.trigger[aria-expanded="true"] .chevron {
+  transform: rotate(180deg);
+}
+
+.menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  min-width: 200px;
+  margin: 0;
+  padding: 8px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 12px 28px rgba(15, 26, 18, 0.18);
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+}
+
+.option,
+.optionActive {
+  display: block;
+  width: 100%;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--bay);
+  font-size: 0.9rem;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.option:hover {
+  background: var(--cream);
+}
+
+.optionActive {
+  background: var(--bay);
+  color: var(--cream);
+}
