@@ -1,0 +1,160 @@
+.section {
+  margin-top: 48px;
+  padding-top: 40px;
+  border-top: 2px solid #e5d5c3;
+}
+
+.sectionTitle {
+  margin: 0 0 16px;
+  font-size: 1.35rem;
+  color: var(--bay);
+}
+
+.picker {
+  display: inline-flex;
+  flex-direction: row-reverse;
+  margin-bottom: 20px;
+}
+
+.pickerStar {
+  appearance: none;
+  border: none;
+  background: transparent;
+  padding: 4px 3px;
+  font-size: 2rem;
+  line-height: 1;
+  color: #d8cfc0;
+  cursor: pointer;
+  transition: color 0.15s ease, transform 0.15s ease;
+}
+
+.pickerStar:hover,
+.pickerStar:hover ~ .pickerStar,
+.pickerStar:focus-visible,
+.pickerStar:focus-visible ~ .pickerStar {
+  color: var(--saffron);
+}
+
+.pickerStar:hover {
+  transform: scale(1.15);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 36px;
+}
+
+.textarea {
+  width: 100%;
+  resize: vertical;
+  padding: 14px 16px;
+  border: 2px solid #e5d5c3;
+  border-radius: 12px;
+  background: #fff;
+  color: var(--bay);
+  font-size: 0.98rem;
+  font-family: inherit;
+  transition: border-color 0.15s ease;
+}
+
+.textarea::placeholder {
+  color: #a39b8a;
+}
+
+.textarea:focus {
+  outline: none;
+  border-color: var(--saffron);
+}
+
+.submit {
+  align-self: flex-start;
+  padding: 10px 22px;
+  border: 2px solid var(--bay);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--bay);
+  font-size: 0.95rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.submit:hover {
+  background: var(--bay);
+  color: var(--cream);
+}
+
+.commentsTitle {
+  margin: 0 0 14px;
+  font-size: 1.1rem;
+  color: var(--bay);
+}
+
+.comments {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.comment {
+  padding: 16px 18px;
+  border: 2px solid #e5d5c3;
+  border-radius: 14px;
+  background: #fff;
+}
+
+.commentHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
+.commentAuthorRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.commentAuthor {
+  font-weight: 700;
+  color: var(--bay);
+}
+
+.stars {
+  display: inline-flex;
+  gap: 2px;
+}
+
+.starFilled,
+.starEmpty {
+  font-size: 0.95rem;
+}
+
+.starFilled {
+  color: var(--saffron);
+}
+
+.starEmpty {
+  color: #d8cfc0;
+}
+
+.commentDate {
+  font-size: 0.82rem;
+  color: #7a7566;
+  white-space: nowrap;
+}
+
+.commentText {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: #5f6b5f;
+}

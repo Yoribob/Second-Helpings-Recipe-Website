@@ -135,7 +135,6 @@
     visibility 0s linear 0.15s;
 }
 
-/* bridge the hover gap between the trigger and the panel */
 .dropdown::before {
   content: "";
   position: absolute;

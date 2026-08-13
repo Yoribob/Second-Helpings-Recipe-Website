@@ -1,0 +1,160 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  margin-top: 30px;
+}
+
+.serveBar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.serveLabel {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #7a7566;
+}
+
+.stepper {
+  display: inline-flex;
+  align-items: center;
+  border: 2px solid #e5d5c3;
+  border-radius: 999px;
+  background: #fff;
+  overflow: hidden;
+}
+
+.stepButton {
+  appearance: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  color: var(--bay);
+  font-size: 1.1rem;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.stepButton:hover {
+  background: var(--bay);
+  color: var(--cream);
+}
+
+.stepButton:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.stepButton:disabled:hover {
+  background: transparent;
+  color: var(--bay);
+}
+
+.serveInput {
+  width: 52px;
+  height: 32px;
+  border: none;
+  outline: none;
+  background: transparent;
+  text-align: center;
+  color: var(--bay);
+  font-size: 0.95rem;
+  font-weight: 700;
+  font-family: inherit;
+  -moz-appearance: textfield;
+}
+
+.serveInput::-webkit-outer-spin-button,
+.serveInput::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.serveInput:focus {
+  background: #fdf6e3;
+}
+
+.sectionTitle {
+  margin: 0 0 14px;
+  font-size: 1.35rem;
+  color: var(--bay);
+}
+
+.ingredients {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: 24px;
+  align-items: baseline;
+}
+
+.ingredient {
+  display: contents;
+}
+
+.ingredientName {
+  padding: 10px 0;
+  color: var(--bay);
+}
+
+.ingredientAmount {
+  padding: 10px 0;
+  white-space: nowrap;
+}
+
+.originalAmount {
+  display: inline-block;
+  min-width: 4.5rem;
+  color: #7a7566;
+  font-size: 0.88rem;
+}
+
+.scaledAmount {
+  display: inline-block;
+  color: var(--saffron);
+  font-size: 0.88rem;
+  font-weight: 700;
+  text-indent: 0.9rem;
+}
+
+.steps {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.step {
+  display: flex;
+  gap: 14px;
+  padding: 12px 0;
+  font-size: 0.98rem;
+  line-height: 1.55;
+  color: var(--bay);
+}
+
+.stepNumber {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: var(--bay);
+  color: var(--cream);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
