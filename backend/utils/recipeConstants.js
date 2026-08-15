@@ -9,7 +9,8 @@ const SUGGESTED_CATEGORIES = [
   'Soup',
   'Salad',
   'Side Dish',
-  'Main Course'
+  'Main Course',
+  'Other'
 ]
 
 const DIFFICULTIES = ['Easy', 'Medium', 'Hard']

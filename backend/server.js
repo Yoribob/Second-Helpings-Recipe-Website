@@ -11,6 +11,7 @@ const refreshRoutes = require('./routes/refreshRoutes')
 const logoutRoutes = require('./routes/logoutRoutes')
 const userRoutes = require('./routes/userRoutes')
 const recipeRoutes = require('./routes/recipeRoutes')
+const bookmarkRoutes = require('./routes/bookmarkRoutes')
 const app = express()
 const server = http.createServer(app)
 const corsOriginFn = (origin, callback) => {
@@ -30,6 +31,7 @@ app.use('/api/refresh-token', refreshRoutes)
 app.use('/api/logout', logoutRoutes)
 app.use('/api/user', userRoutes)
 app.use('/api/recipes', recipeRoutes)
+app.use('/api/bookmarks', bookmarkRoutes)
 ;(async () => {
   try {
     await prisma.$connect()

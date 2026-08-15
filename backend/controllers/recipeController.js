@@ -8,7 +8,7 @@ const {
 
 async function getAllRecipes(req, res) {
   try {
-    const userId = req.user.userId
+    const userId = req.user?.userId
 
     const {
       search,
@@ -29,12 +29,14 @@ async function getAllRecipes(req, res) {
     const limitNum = Math.min(100, Math.max(1, parseInt(limit) || 20))
     const skip = (pageNum - 1) * limitNum
 
-    const where = {
-      OR: [
-        { userId: userId },
-        { isGlobal: true }
-      ]
-    }
+    const where = userId
+      ? {
+          OR: [
+            { userId: userId },
+            { isGlobal: true }
+          ]
+        }
+      : { isGlobal: true }
 
     if (search && search.trim()) {
       where.AND = where.AND || []
@@ -145,7 +147,7 @@ async function getAllRecipes(req, res) {
 async function getRecipeById(req, res) {
   try {
     const { id } = req.params
-    const userId = req.user.userId
+    const userId = req.user?.userId
 
     const recipe = await prisma.recipe.findUnique({
       where: { id },
@@ -270,6 +272,10 @@ async function createRecipe(req, res) {
       return res.status(400).json({ msg: 'Dietary tags must be an array' })
     }
 
+    if (isGlobal) {
+      return res.status(403).json({ msg: 'Recipes are published only after manual verification' })
+    }
+
     const recipe = await prisma.recipe.create({
       data: {
         userId: userId,
@@ -277,7 +283,8 @@ async function createRecipe(req, res) {
         description: description || null,
         steps,
         imageUrl: imageUrl || null,
-        isGlobal: isGlobal || false,
+        isGlobal: false,
+        status: 'draft',
         category: category || null,
         difficulty: difficulty || null,
         cookingTime: cookingTime ? parseInt(cookingTime) : null,
@@ -315,6 +322,7 @@ async function updateRecipe(req, res) {
       imageUrl,
       ingredients,
       isGlobal,
+      status,
       category,
       difficulty,
       cookingTime,
@@ -367,7 +375,24 @@ async function updateRecipe(req, res) {
       updateData.steps = steps
     }
     if (imageUrl !== undefined) updateData.imageUrl = imageUrl
-    if (isGlobal !== undefined) updateData.isGlobal = isGlobal
+
+    if (isGlobal !== undefined && isGlobal === true) {
+      return res.status(403).json({ msg: 'Recipes are published only after manual verification' })
+    }
+
+    if (status !== undefined) {
+      if (!['draft', 'pending', 'published'].includes(status)) {
+        return res.status(400).json({ msg: 'Status must be draft, pending, or published' })
+      }
+      if (status === 'published') {
+        return res.status(403).json({ msg: 'Recipes are published only after manual verification' })
+      }
+      if (existingRecipe.isGlobal) {
+        return res.status(400).json({ msg: "You can't change the status of a public recipe" })
+      }
+      updateData.status = status
+    }
+
     if (category !== undefined) updateData.category = category
     if (difficulty !== undefined) updateData.difficulty = difficulty
     if (cookingTime !== undefined) updateData.cookingTime = cookingTime ? parseInt(cookingTime) : null
@@ -444,14 +469,16 @@ async function deleteRecipe(req, res) {
 
 async function getRecipeMetadata(req, res) {
   try {
-    const userId = req.user.userId
+    const userId = req.user?.userId
 
-    const accessWhere = {
-      OR: [
-        { userId: userId },
-        { isGlobal: true }
-      ]
-    }
+    const accessWhere = userId
+      ? {
+          OR: [
+            { userId: userId },
+            { isGlobal: true }
+          ]
+        }
+      : { isGlobal: true }
 
     const [dbCategories, dbCuisines, dbDietaryTags, dbDifficulties] = await Promise.all([
       prisma.recipe.findMany({

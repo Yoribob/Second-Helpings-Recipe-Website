@@ -10,4 +10,16 @@ function authMiddleware(req, res, next) {
     return res.status(401).json({msg:'Invalid or expired token'})
   }
 }
+
+function optionalAuthMiddleware(req, res, next) {
+  const token = req.cookies.accessToken
+  if (token) {
+    try {
+      req.user = verifyAccessToken(token)
+    } catch {}
+  }
+  next()
+}
+
 module.exports = authMiddleware
+module.exports.optionalAuth = optionalAuthMiddleware

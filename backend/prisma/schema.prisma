@@ -17,6 +17,7 @@ model User {
 
   recipes       Recipe[]
   refreshTokens RefreshToken[]
+  bookmarks     Bookmark[]
 }
 
 model Recipe {
@@ -27,6 +28,7 @@ model Recipe {
   steps       String[]
   imageUrl    String?
   isGlobal    Boolean  @default(false)
+  status      String   @default("draft")
   category    String?
   difficulty  String?
   cookingTime Int?
@@ -59,4 +61,16 @@ model RefreshToken {
   ip        String?
 
   user      User     @relation(fields: [userId], references: [id])
+}
+
+model Bookmark {
+  id        String   @id @default(uuid())
+  userId    String
+  recipeId  String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, recipeId])
+  @@index([userId])
 }

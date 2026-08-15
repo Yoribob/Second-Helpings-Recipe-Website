@@ -12,22 +12,20 @@ const {
   getRecipeMetadata
 } = require('../controllers/recipeController')
 
-router.use(authMiddleware)
-
 router.get('/metadata', getRecipeMetadata)
 
 router.get('/', getAllRecipes)
 
-router.get('/my', getMyRecipes)
-
 router.get('/global', getGlobalRecipes)
 
-router.get('/:id', getRecipeById)
+router.get('/my', authMiddleware, getMyRecipes)
 
-router.post('/', createRecipe)
+router.get('/:id', authMiddleware.optionalAuth, getRecipeById)
 
-router.put('/:id', updateRecipe)
+router.post('/', authMiddleware, createRecipe)
 
-router.delete('/:id', deleteRecipe)
+router.put('/:id', authMiddleware, updateRecipe)
+
+router.delete('/:id', authMiddleware, deleteRecipe)
 
 module.exports = router
