@@ -1,17 +1,27 @@
+export interface RecipeUser {
+    id: string,
+    username: string,
+    usernameOriginal: string
+}
+
+export type RecipeStatus = "draft" | "pending" | "published"
+
 export interface Recipe {
     id: string,
     title: string,
-    description?: string,
+    description?: string | null,
     steps: string[],
-    imageUrl?: string,
-    isGlobal: boolean
-    category?: string,
-    difficulty?: Difficulty,
-    cookingTime: number,
-    servings?: number,
-    cuisine?: string,
+    imageUrl?: string | null,
+    isGlobal: boolean,
+    status?: RecipeStatus,
+    category?: string | null,
+    difficulty?: Difficulty | null,
+    cookingTime?: number | null,
+    servings?: number | null,
+    cuisine?: string | null,
     dietaryTags: string[],
-    ingredients: Ingredient[]
+    ingredients: Ingredient[],
+    user?: RecipeUser | null
 }
 
 export interface Ingredient {
@@ -20,5 +30,28 @@ export interface Ingredient {
     unit: string
 }
 
+export interface NewRecipeInput {
+    title: string
+    description?: string | null
+    steps: string[]
+    imageUrl?: string | null
+    isGlobal: boolean
+    category?: string | null
+    difficulty?: Difficulty | null
+    cookingTime?: number | null
+    servings?: number | null
+    cuisine?: string | null
+    dietaryTags: string[]
+    ingredients: Ingredient[]
+}
+
 export type Difficulty = "Easy" | "Medium" | "Hard"
+
+export interface ApiUser {
+    id: string,
+    username: string,
+    usernameOriginal: string,
+    email: string,
+    createdAt: string
+}
 

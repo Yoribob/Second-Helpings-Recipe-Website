@@ -42,3 +42,9 @@
   color: var(--bay);
   margin: 0 0 20px;
 }
+
+.empty {
+  margin: 0;
+  font-size: 1rem;
+  color: #5f6b5f;
+}

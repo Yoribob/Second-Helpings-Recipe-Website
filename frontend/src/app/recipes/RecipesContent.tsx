@@ -1,9 +1,10 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { RecipeCard } from "@/components/recipes/RecipeCard";
-import { sampleRecipes } from "@/lib/sample-data";
+import { api } from "@/lib/api";
+import type { Recipe } from "@/lib/types";
 import { SearchBar } from "@/components/ui/SearchBar";
 import {
   FilterGroup,
@@ -75,6 +76,30 @@ export function RecipesContent() {
   );
   const [sortBy, setSortBy] = useState<"title" | "cookingTime">("title");
   const [panelOpen, setPanelOpen] = useState(false);
+  const [recipes, setRecipes] = useState<Recipe[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    api
+      .getRecipes({ limit: "100" })
+      .then((data) => {
+        if (!cancelled) {
+          setRecipes(data.recipes);
+          setLoading(false);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setLoadError(true);
+          setLoading(false);
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const [prevSearchParams, setPrevSearchParams] = useState(searchParams);
 
@@ -121,7 +146,7 @@ export function RecipesContent() {
   };
 
   const sorted = useMemo(() => {
-    const filtered = sampleRecipes.filter((recipe) => {
+    const filtered = recipes.filter((recipe) => {
       const haystack = [
         recipe.title,
         recipe.description,
@@ -137,7 +162,8 @@ export function RecipesContent() {
         difficulty === "All" || recipe.difficulty === difficulty;
       const cuisineOK = cuisine === "All" || recipe.cuisine === cuisine;
       const maxCookingTimeOK =
-        maxCookingTime === "All" || recipe.cookingTime <= maxCookingTime;
+        maxCookingTime === "All" ||
+        (recipe.cookingTime != null && recipe.cookingTime <= maxCookingTime);
       const dietaryTagsOK =
         dietaryTags.includes("All") ||
         dietaryTags.every((tag) => recipe.dietaryTags.includes(tag));
@@ -154,7 +180,7 @@ export function RecipesContent() {
 
     return [...filtered].sort((a, b) => {
       if (sortBy === "title") return a.title.localeCompare(b.title);
-      return a.cookingTime - b.cookingTime;
+      return (a.cookingTime ?? Infinity) - (b.cookingTime ?? Infinity);
     });
   }, [
     query,
@@ -164,6 +190,7 @@ export function RecipesContent() {
     dietaryTags,
     maxCookingTime,
     sortBy,
+    recipes,
   ]);
 
   const count = sorted.length;
@@ -286,10 +313,17 @@ export function RecipesContent() {
       </div>
 
       <div className="recipe-grid">
-        {sorted.length === 0 && <p>No matching recipes</p>}
-        {sorted.map((recipe) => (
-          <RecipeCard key={recipe.id} recipe={recipe} />
-        ))}
+        {loading ? (
+          <p>Loading recipes…</p>
+        ) : loadError ? (
+          <p>Couldn&apos;t load recipes from the server.</p>
+        ) : sorted.length === 0 ? (
+          <p>No matching recipes</p>
+        ) : (
+          sorted.map((recipe) => (
+            <RecipeCard key={recipe.id} recipe={recipe} />
+          ))
+        )}
       </div>
     </main>
   );

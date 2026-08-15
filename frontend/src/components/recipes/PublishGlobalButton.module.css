@@ -1,0 +1,46 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border: 2px solid var(--bay);
+  border-radius: 999px;
+  background: var(--bay);
+  color: var(--cream);
+  font-size: 0.88rem;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.button:hover,
+.button:focus-visible {
+  background: var(--bay-light);
+  outline: none;
+}
+
+.button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.pending {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border: 2px dashed var(--saffron);
+  border-radius: 999px;
+  background: rgba(224, 166, 43, 0.12);
+  color: var(--saffron);
+  font-size: 0.88rem;
+  font-weight: 700;
+  font-family: inherit;
+}
+
+.error {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #96281b;
+}

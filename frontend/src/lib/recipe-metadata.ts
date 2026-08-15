@@ -10,6 +10,7 @@ export const CATEGORIES = [
   "Salad",
   "Side Dish",
   "Main Course",
+  "Other",
 ] as const;
 
 export const DIFFICULTIES = ["Easy", "Medium", "Hard"] as const;

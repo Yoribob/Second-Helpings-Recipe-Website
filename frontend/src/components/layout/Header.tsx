@@ -6,7 +6,9 @@ import {
   DIETARY_TAGS,
   MAX_COOKING_TIME,
 } from "@/lib/recipe-metadata";
-import { sampleRecipes } from "@/lib/sample-data";
+import { serverGetJson } from "@/lib/server-api";
+import type { Recipe } from "@/lib/types";
+import { AuthNav } from "@/components/layout/AuthNav";
 import styles from "./Header.module.css";
 
 type NavGroup = {
@@ -14,55 +16,63 @@ type NavGroup = {
   items: { label: string; href: string }[];
 };
 
-const navGroups: NavGroup[] = [
-  {
-    label: "Categories",
-    items: [
-      { label: "All recipes", href: "/recipes" },
-      ...CATEGORIES.map((value) => ({
-        label: value,
-        href: `/recipes?category=${encodeURIComponent(value)}`,
-      })),
-    ],
-  },
-  {
-    label: "Popular",
-    items: sampleRecipes.slice(0, 5).map((recipe) => ({
+export async function Header() {
+  let popularItems: { label: string; href: string }[] = [];
+  try {
+    const data = await serverGetJson<{ recipes: Recipe[] }>(
+      "/api/recipes?limit=5",
+    );
+    popularItems = (data?.recipes ?? []).map((recipe) => ({
       label: recipe.title,
       href: `/recipes/${recipe.id}`,
-    })),
-  },
-  {
-    label: "Difficulties",
-    items: DIFFICULTIES.map((value) => ({
-      label: value,
-      href: `/recipes?difficulty=${encodeURIComponent(value)}`,
-    })),
-  },
-  {
-    label: "Cuisines",
-    items: CUISINES.map((value) => ({
-      label: value,
-      href: `/recipes?cuisine=${encodeURIComponent(value)}`,
-    })),
-  },
-  {
-    label: "Dietary",
-    items: DIETARY_TAGS.map((value) => ({
-      label: value,
-      href: `/recipes?dietaryTags=${encodeURIComponent(value)}`,
-    })),
-  },
-  {
-    label: "Cooking time",
-    items: MAX_COOKING_TIME.map((value) => ({
-      label: `≤ ${value} mins`,
-      href: `/recipes?maxCookingTime=${value}`,
-    })),
-  },
-];
+    }));
+  } catch {}
 
-export function Header() {
+  const navGroups: NavGroup[] = [
+    {
+      label: "Categories",
+      items: [
+        { label: "All recipes", href: "/recipes" },
+        ...CATEGORIES.map((value) => ({
+          label: value,
+          href: `/recipes?category=${encodeURIComponent(value)}`,
+        })),
+      ],
+    },
+    {
+      label: "Popular",
+      items: popularItems,
+    },
+    {
+      label: "Difficulties",
+      items: DIFFICULTIES.map((value) => ({
+        label: value,
+        href: `/recipes?difficulty=${encodeURIComponent(value)}`,
+      })),
+    },
+    {
+      label: "Cuisines",
+      items: CUISINES.map((value) => ({
+        label: value,
+        href: `/recipes?cuisine=${encodeURIComponent(value)}`,
+      })),
+    },
+    {
+      label: "Dietary",
+      items: DIETARY_TAGS.map((value) => ({
+        label: value,
+        href: `/recipes?dietaryTags=${encodeURIComponent(value)}`,
+      })),
+    },
+    {
+      label: "Cooking time",
+      items: MAX_COOKING_TIME.map((value) => ({
+        label: `≤ ${value} mins`,
+        href: `/recipes?maxCookingTime=${value}`,
+      })),
+    },
+  ].filter((group) => group.items.length > 0);
+
   return (
     <header className={styles.header}>
       <div className={styles.inner}>
@@ -73,13 +83,12 @@ export function Header() {
           <span className={styles.brandName}>Second Helpings</span>
         </Link>
 
-        <nav aria-label="Main">
+        <nav aria-label="Main" className={styles.navRow}>
           <ul className={styles.nav}>
             {navGroups.map((group) => (
               <li key={group.label} className={styles.navItem}>
                 <Link href="/recipes" className={styles.navButton}>
                   {group.label}
-                  
                 </Link>
 
                 <ul className={styles.dropdown}>
@@ -95,15 +104,9 @@ export function Header() {
             ))}
           </ul>
         </nav>
-      </div>
 
-      <button
-        type="button"
-        className={styles.profile}
-        title="Profile — coming soon"
-      >
-        Profile
-      </button>
+        <AuthNav />
+      </div>
     </header>
   );
 }

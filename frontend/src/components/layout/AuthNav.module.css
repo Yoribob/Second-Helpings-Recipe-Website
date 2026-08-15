@@ -1,0 +1,147 @@
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 640px) {
+  .actions {
+    order: 2;
+  }
+}
+
+.link {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 14px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--cream);
+  font-size: 0.92rem;
+  font-weight: 600;
+  font-family: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+}
+
+.link:hover,
+.link:focus-visible {
+  background: rgba(246, 241, 227, 0.12);
+  color: var(--saffron);
+  outline: none;
+}
+
+.cta {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 18px;
+  border: none;
+  border-radius: 999px;
+  background: var(--saffron);
+  color: var(--bay);
+  font-size: 0.92rem;
+  font-weight: 700;
+  font-family: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  transition: filter 0.15s ease;
+}
+
+.cta:hover,
+.cta:focus-visible {
+  filter: brightness(1.06);
+  outline: none;
+}
+
+.menu {
+  position: relative;
+  display: flex;
+
+}
+
+.userButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border: none;
+  border-radius: 999px;
+  background: var(--saffron);
+  color: var(--bay);
+  font-size: 0.92rem;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: filter 0.15s ease;
+}
+
+.userButton:hover,
+.userButton:focus-visible,
+.userButton[aria-expanded="true"] {
+  filter: brightness(1.06);
+  outline: none;
+}
+
+.userName {
+  max-width: 130px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: inherit;
+}
+
+.dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 130;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 200px;
+  padding: 8px;
+  border-radius: 12px;
+  background: #fff;
+  color: var(--bay);
+  box-shadow: 0 12px 28px rgba(15, 26, 18, 0.22);
+}
+
+.dropdownItem {
+  display: block;
+  width: 100%;
+  padding: 10px 14px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--bay);
+  font-size: 0.92rem;
+  font-weight: 600;
+  font-family: inherit;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+}
+
+.dropdownItem:hover,
+.dropdownItem:focus-visible {
+  background: var(--cream);
+  color: var(--bay);
+  outline: none;
+}
+
+.divider {
+  height: 1px;
+  margin: 4px 0;
+  background: #e5d5c3;
+}

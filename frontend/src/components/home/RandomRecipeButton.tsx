@@ -1,20 +1,35 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { sampleRecipes } from "@/lib/sample-data";
+import { useState } from "react";
+import { api } from "@/lib/api";
 import styles from "./RandomRecipeButton.module.css";
 
 export function RandomRecipeButton() {
   const router = useRouter();
+  const [busy, setBusy] = useState(false);
 
-  const handleClick = () => {
-    const recipe =
-      sampleRecipes[Math.floor(Math.random() * sampleRecipes.length)];
-    router.push(`/recipes/${recipe.id}`);
+  const handleClick = async () => {
+    if (busy) return;
+    setBusy(true);
+    try {
+      const { recipes } = await api.getRecipes({ limit: "100" });
+      if (recipes.length === 0) return;
+      const recipe = recipes[Math.floor(Math.random() * recipes.length)];
+      router.push(`/recipes/${recipe.id}`);
+    } catch {
+    } finally {
+      setBusy(false);
+    }
   };
 
   return (
-    <button className={styles.button} type="button" onClick={handleClick}>
+    <button
+      className={styles.button}
+      type="button"
+      onClick={handleClick}
+      disabled={busy}
+    >
       Random recipe
     </button>
   );

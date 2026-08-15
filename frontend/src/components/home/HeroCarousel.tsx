@@ -2,28 +2,28 @@
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { sampleRecipes } from "@/lib/sample-data";
 import styles from "./HeroCarousel.module.css";
 
-const slides = sampleRecipes
-  .filter((recipe) => recipe.imageUrl)
-  .slice(0, 4)
-  .map((recipe) => ({
-    src: recipe.imageUrl as string,
-    title: recipe.title,
-    description: recipe.description ?? "",
-  }));
+export type CarouselSlide = {
+  src: string;
+  title: string;
+  description: string;
+};
 
-export function HeroCarousel() {
+export function HeroCarousel({ slides }: { slides: CarouselSlide[] }) {
   const [index, setIndex] = useState(0);
   const total = slides.length;
 
   useEffect(() => {
+    if (total <= 1) return;
+
     const timer = setInterval(() => {
       setIndex((current) => (current + 1) % total);
     }, 5000);
     return () => clearInterval(timer);
-  }, [total, index]);
+  }, [total]);
+
+  if (total === 0) return null;
 
   const goTo = (target: number) => {
     setIndex((target + total) % total);

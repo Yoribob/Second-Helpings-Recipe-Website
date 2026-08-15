@@ -8,14 +8,17 @@
 }
 
 .inner {
-  max-width: 1200px;
+  width:100%;
   margin: 0 auto;
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
-  justify-content: space-between;
   gap: 12px 24px;
   padding: 12px 0;
+}
+
+.navRow {
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 .brand {
@@ -29,7 +32,7 @@
 .logoMark {
   width: 34px;
   height: 34px;
-  border-radius: 9px;
+  border-radius: 999px;
   background: var(--saffron);
   color: var(--bay);
   font-family: var(--font-display);
@@ -50,11 +53,11 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
+  justify-content: center;
   gap: 4px;
   list-style: none;
   margin: 0;
   padding: 0;
-  padding-right: 140px;
 }
 
 .profile {
@@ -74,7 +77,9 @@
   font-weight: 500;
   font-family: inherit;
   cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
 }
 
 .profile:hover,
@@ -168,12 +173,17 @@
   outline: none;
 }
 
-@media (max-width: 720px) {
+@media (max-width: 640px) {
   .inner {
-    justify-content: center;
+    flex-wrap: wrap;
   }
 
-  .nav {
-    justify-content: center;
+  .brand {
+    order: 1;
+  }
+
+  .navRow {
+    order: 3;
+    flex: 1 1 100%;
   }
 }

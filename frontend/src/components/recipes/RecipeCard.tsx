@@ -3,6 +3,7 @@ import Link from "next/link";
 import styles from "@/components/recipes/RecipeCard.module.css";
 import type { Recipe } from "@/lib/types";
 import { formatMinutes } from "@/lib/format";
+import { BookmarkButton } from "@/components/recipes/BookmarkButton";
 
 type RecipeCardProps = {
   recipe: Recipe;
@@ -11,8 +12,17 @@ type RecipeCardProps = {
 export function RecipeCard({ recipe }: RecipeCardProps) {
   const recipeUrl = `/recipes/${recipe.id}`;
 
+  const meta = [
+    recipe.cookingTime ? formatMinutes(recipe.cookingTime) : null,
+    recipe.servings ? `${recipe.servings} servings` : null,
+  ]
+    .filter(Boolean)
+    .join(" | ");
+
   return (
-    <article className={styles.card}>
+    <article
+      className={`${styles.card}${recipe.imageUrl ? "" : ` ${styles.noImage}`}`}
+    >
       {recipe.imageUrl && (
         <Link href={recipeUrl} className={styles.imageLink}>
           <Image
@@ -26,6 +36,10 @@ export function RecipeCard({ recipe }: RecipeCardProps) {
         </Link>
       )}
 
+      <span className={styles.bookmark}>
+        <BookmarkButton recipeId={recipe.id} size="sm" />
+      </span>
+
       <div className={styles.body}>
         <h3 className={styles.title}>
           <Link href={recipeUrl} className={styles.titleLink}>
@@ -37,9 +51,7 @@ export function RecipeCard({ recipe }: RecipeCardProps) {
           <p className={styles.description}>{recipe.description}</p>
         )}
 
-        <p className={styles.meta}>
-          {formatMinutes(recipe.cookingTime)} | {recipe.servings} servings
-        </p>
+        {meta && <p className={styles.meta}>{meta}</p>}
 
         {(recipe.category || recipe.difficulty || recipe.cuisine) && (
           <div className={styles.chips}>
