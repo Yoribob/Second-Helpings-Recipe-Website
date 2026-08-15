@@ -2,6 +2,7 @@ import type {
   ApiUser,
   NewRecipeInput,
   Recipe,
+  RecipeComment,
   RecipeStatus,
 } from "@/lib/types";
 
@@ -125,6 +126,30 @@ export const api = {
 
   getMyRecipes() {
     return request<{ recipes: Recipe[] }>("/api/recipes/my");
+  },
+
+  rateRecipe(id: string, value: number) {
+    return request<{
+      msg: string;
+      rating: { value: number; average: number; count: number };
+    }>(`/api/recipes/${encodeURIComponent(id)}/rating`, {
+      method: "POST",
+      body: JSON.stringify({ value }),
+    });
+  },
+
+  createComment(id: string, text: string) {
+    return request<{ msg: string; comment: RecipeComment }>(
+      `/api/recipes/${encodeURIComponent(id)}/comments`,
+      { method: "POST", body: JSON.stringify({ text }) },
+    );
+  },
+
+  deleteComment(id: string, commentId: string) {
+    return request<{ msg: string }>(
+      `/api/recipes/${encodeURIComponent(id)}/comments/${encodeURIComponent(commentId)}`,
+      { method: "DELETE" },
+    );
   },
 
   createRecipe(body: NewRecipeInput) {

@@ -6,6 +6,17 @@ const {
   DIETARY_TAGS
 } = require('../utils/recipeConstants')
 
+function toRatingSummary(recipe) {
+  return {
+    average: Math.round((recipe.ratingAvg || 0) * 10) / 10,
+    count: recipe.ratingCount || 0
+  }
+}
+
+function serializeRecipe(recipe) {
+  return { ...recipe, rating: toRatingSummary(recipe) }
+}
+
 async function getAllRecipes(req, res) {
   try {
     const userId = req.user?.userId
@@ -103,10 +114,12 @@ async function getAllRecipes(req, res) {
       }
     }
 
-    const validSortFields = ['createdAt', 'updatedAt', 'title', 'cookingTime']
+    const validSortFields = ['createdAt', 'updatedAt', 'title', 'cookingTime', 'rating']
     const sortField = validSortFields.includes(sortBy) ? sortBy : 'createdAt'
     const order = sortOrder.toLowerCase() === 'asc' ? 'asc' : 'desc'
-    const orderBy = { [sortField]: order }
+    const orderBy = sortField === 'rating'
+      ? [{ ratingAvg: order }, { ratingCount: order }, { createdAt: order }]
+      : { [sortField]: order }
 
     const total = await prisma.recipe.count({ where })
 
@@ -130,7 +143,7 @@ async function getAllRecipes(req, res) {
     const totalPages = Math.ceil(total / limitNum)
 
     res.json({
-      recipes,
+      recipes: recipes.map(serializeRecipe),
       pagination: {
         page: pageNum,
         limit: limitNum,
@@ -153,6 +166,21 @@ async function getRecipeById(req, res) {
       where: { id },
       include: {
         ingredients: true,
+        ratings: {
+          select: { userId: true, value: true }
+        },
+        comments: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                username: true,
+                usernameOriginal: true
+              }
+            }
+          },
+          orderBy: { createdAt: 'desc' }
+        },
         user: {
           select: {
             id: true,
@@ -171,7 +199,24 @@ async function getRecipeById(req, res) {
       return res.status(403).json({ msg: 'Access denied' })
     }
 
-    res.json({ recipe })
+    const myRating = userId
+      ? recipe.ratings.find((r) => r.userId === userId)?.value ?? null
+      : null
+
+    const comments = recipe.comments.map((comment) => ({
+      id: comment.id,
+      text: comment.text,
+      rating: comment.rating,
+      createdAt: comment.createdAt,
+      author: {
+        id: comment.user.id,
+        username: comment.user.username,
+        usernameOriginal: comment.user.usernameOriginal
+      },
+      mine: comment.userId === userId
+    }))
+
+    res.json({ recipe: { ...serializeRecipe(recipe), myRating, comments } })
   } catch (err) {
     console.error('Get recipe by ID error:', err)
     res.status(500).json({ msg: 'Failed to fetch recipe' })
@@ -188,7 +233,7 @@ async function getMyRecipes(req, res) {
       },
       orderBy: { createdAt: 'desc' }
     })
-    res.json({ recipes })
+    res.json({ recipes: recipes.map(serializeRecipe) })
   } catch (err) {
     console.error('Get my recipes error:', err)
     res.status(500).json({ msg: 'Failed to fetch your recipes' })
@@ -211,7 +256,7 @@ async function getGlobalRecipes(req, res) {
       },
       orderBy: { createdAt: 'desc' }
     })
-    res.json({ recipes })
+    res.json({ recipes: recipes.map(serializeRecipe) })
   } catch (err) {
     console.error('Get global recipes error:', err)
     res.status(500).json({ msg: 'Failed to fetch global recipes' })
@@ -304,7 +349,7 @@ async function createRecipe(req, res) {
       }
     })
 
-    res.status(201).json({ msg: 'Recipe created successfully', recipe })
+    res.status(201).json({ msg: 'Recipe created successfully', recipe: serializeRecipe(recipe) })
   } catch (err) {
     console.error('Create recipe error:', err)
     res.status(500).json({ msg: 'Failed to create recipe' })
@@ -432,7 +477,7 @@ async function updateRecipe(req, res) {
       }
     })
 
-    res.json({ msg: 'Recipe updated successfully', recipe: updatedRecipe })
+    res.json({ msg: 'Recipe updated successfully', recipe: serializeRecipe(updatedRecipe) })
   } catch (err) {
     console.error('Update recipe error:', err)
     res.status(500).json({ msg: 'Failed to update recipe' })
@@ -541,6 +586,144 @@ async function getRecipeMetadata(req, res) {
   }
 }
 
+async function rateRecipe(req, res) {
+  try {
+    const { id } = req.params
+    const userId = req.user.userId
+    const value = Number(req.body.value)
+
+    if (!Number.isInteger(value) || value < 1 || value > 5) {
+      return res.status(400).json({ msg: 'Rating must be a whole number from 1 to 5' })
+    }
+
+    const recipe = await prisma.recipe.findUnique({ where: { id } })
+    if (!recipe) {
+      return res.status(404).json({ msg: 'Recipe not found' })
+    }
+    if (recipe.userId !== userId && !recipe.isGlobal) {
+      return res.status(403).json({ msg: 'Access denied' })
+    }
+
+    await prisma.$transaction(async (tx) => {
+      await tx.recipeRating.upsert({
+        where: { userId_recipeId: { userId, recipeId: id } },
+        update: { value },
+        create: { userId, recipeId: id, value }
+      })
+
+      const agg = await tx.recipeRating.aggregate({
+        where: { recipeId: id },
+        _avg: { value: true },
+        _count: { value: true }
+      })
+
+      await tx.recipe.update({
+        where: { id },
+        data: {
+          ratingAvg: agg._avg.value ?? 0,
+          ratingCount: agg._count.value
+        }
+      })
+    })
+
+    const updatedRecipe = await prisma.recipe.findUnique({ where: { id } })
+    res.json({
+      msg: 'Rating saved',
+      rating: { value, average: toRatingSummary(updatedRecipe).average, count: updatedRecipe.ratingCount }
+    })
+  } catch (err) {
+    console.error('Rate recipe error:', err)
+    res.status(500).json({ msg: 'Failed to save rating' })
+  }
+}
+
+async function createComment(req, res) {
+  try {
+    const { id } = req.params
+    const userId = req.user.userId
+    const text = String(req.body.text || '').trim()
+
+    if (!text) {
+      return res.status(400).json({ msg: 'Comment text is required' })
+    }
+    if (text.length > 1000) {
+      return res.status(400).json({ msg: 'Comment must be 1000 characters or fewer' })
+    }
+
+    const recipe = await prisma.recipe.findUnique({ where: { id } })
+    if (!recipe) {
+      return res.status(404).json({ msg: 'Recipe not found' })
+    }
+    if (recipe.userId !== userId && !recipe.isGlobal) {
+      return res.status(403).json({ msg: 'Access denied' })
+    }
+
+    const existingRating = await prisma.recipeRating.findUnique({
+      where: { userId_recipeId: { userId, recipeId: id } }
+    })
+    if (!existingRating) {
+      return res.status(400).json({ msg: 'Rate the recipe before commenting' })
+    }
+
+    const existing = await prisma.recipeComment.findUnique({
+      where: { userId_recipeId: { userId, recipeId: id } }
+    })
+    if (existing) {
+      return res.status(409).json({ msg: 'You already commented on this recipe' })
+    }
+
+    const comment = await prisma.recipeComment.create({
+      data: { userId, recipeId: id, text, rating: existingRating.value },
+      include: {
+        user: {
+          select: { id: true, username: true, usernameOriginal: true }
+        }
+      }
+    })
+
+    res.status(201).json({
+      msg: 'Comment posted',
+      comment: {
+        id: comment.id,
+        text: comment.text,
+        rating: comment.rating,
+        createdAt: comment.createdAt,
+        author: {
+          id: comment.user.id,
+          username: comment.user.username,
+          usernameOriginal: comment.user.usernameOriginal
+        },
+        mine: true
+      }
+    })
+  } catch (err) {
+    console.error('Create comment error:', err)
+    res.status(500).json({ msg: 'Failed to post comment' })
+  }
+}
+
+async function deleteComment(req, res) {
+  try {
+    const { id, commentId } = req.params
+    const comment = await prisma.recipeComment.findUnique({
+      where: { id: commentId }
+    })
+
+    if (!comment || comment.recipeId !== id) {
+      return res.status(404).json({ msg: 'Comment not found' })
+    }
+    if (comment.userId !== req.user.userId) {
+      return res.status(403).json({ msg: 'You can only delete your own comments' })
+    }
+
+    await prisma.recipeComment.delete({ where: { id: commentId } })
+    res.json({ msg: 'Comment deleted' })
+  } catch (err) {
+    console.error('Delete comment error:', err)
+    res.status(500).json({ msg: 'Failed to delete comment' })
+  }
+}
+
 module.exports = {
   getAllRecipes,
   getRecipeById,
@@ -549,5 +732,8 @@ module.exports = {
   createRecipe,
   updateRecipe,
   deleteRecipe,
-  getRecipeMetadata
+  getRecipeMetadata,
+  rateRecipe,
+  createComment,
+  deleteComment
 }

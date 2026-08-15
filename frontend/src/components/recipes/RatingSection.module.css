@@ -13,7 +13,7 @@
 .picker {
   display: inline-flex;
   flex-direction: row-reverse;
-  margin-bottom: 20px;
+  margin-bottom: 12px;
 }
 
 .pickerStar {
@@ -28,6 +28,10 @@
   transition: color 0.15s ease, transform 0.15s ease;
 }
 
+.pickerStarSelected {
+  color: var(--saffron);
+}
+
 .pickerStar:hover,
 .pickerStar:hover ~ .pickerStar,
 .pickerStar:focus-visible,
@@ -37,6 +41,24 @@
 
 .pickerStar:hover {
   transform: scale(1.15);
+}
+
+.stars {
+  display: inline-flex;
+  gap: 2px;
+}
+
+.starFilled,
+.starEmpty {
+  font-size: 0.95rem;
+}
+
+.starFilled {
+  color: var(--saffron);
+}
+
+.starEmpty {
+  color: #d8cfc0;
 }
 
 .form {
@@ -128,28 +150,46 @@
   color: var(--bay);
 }
 
-.stars {
-  display: inline-flex;
-  gap: 2px;
-}
-
-.starFilled,
-.starEmpty {
-  font-size: 0.95rem;
-}
-
-.starFilled {
-  color: var(--saffron);
-}
-
-.starEmpty {
-  color: #d8cfc0;
-}
-
 .commentDate {
   font-size: 0.82rem;
   color: #7a7566;
   white-space: nowrap;
+}
+
+.deleteButton {
+  flex-shrink: 0;
+  padding: 6px 12px;
+  border: 2px solid #e5d5c3;
+  border-radius: 999px;
+  background: transparent;
+  color: #7a7566;
+  font-size: 0.8rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.deleteButton:hover,
+.deleteButton:focus-visible {
+  border-color: #96281b;
+  color: #96281b;
+  outline: none;
+}
+
+.empty {
+  padding: 14px 18px;
+  border: 2px dashed #e5d5c3;
+  border-radius: 14px;
+  color: #7a7566;
+  font-size: 0.9rem;
+}
+
+.error {
+  margin: 0 0 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #96281b;
 }
 
 .commentText {

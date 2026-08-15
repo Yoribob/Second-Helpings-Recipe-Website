@@ -6,6 +6,26 @@ export interface RecipeUser {
 
 export type RecipeStatus = "draft" | "pending" | "published"
 
+export interface RecipeRating {
+    average: number,
+    count: number
+}
+
+export interface RecipeCommentAuthor {
+    id: string,
+    username: string,
+    usernameOriginal: string
+}
+
+export interface RecipeComment {
+    id: string,
+    text: string,
+    rating?: number | null,
+    createdAt: string,
+    author: RecipeCommentAuthor,
+    mine: boolean
+}
+
 export interface Recipe {
     id: string,
     title: string,
@@ -14,6 +34,9 @@ export interface Recipe {
     imageUrl?: string | null,
     isGlobal: boolean,
     status?: RecipeStatus,
+    rating?: RecipeRating | null,
+    myRating?: number | null,
+    comments?: RecipeComment[],
     category?: string | null,
     difficulty?: Difficulty | null,
     cookingTime?: number | null,

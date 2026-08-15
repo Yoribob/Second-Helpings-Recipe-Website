@@ -79,6 +79,38 @@
   color: #7a7566;
 }
 
+.rating {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  font-size: 0.85rem;
+}
+
+.ratingStars {
+  display: inline-flex;
+  gap: 1px;
+  font-size: 0.9rem;
+}
+
+.starFilled {
+  color: var(--saffron);
+}
+
+.starEmpty {
+  color: #d8cfc0;
+}
+
+.ratingValue {
+  font-weight: 700;
+  color: var(--bay);
+}
+
+.ratingCount {
+  color: #7a7566;
+  font-size: 0.8rem;
+}
+
 .chips {
   display: flex;
   flex-wrap: wrap;

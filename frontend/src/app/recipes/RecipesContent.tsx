@@ -47,6 +47,7 @@ const timeChips: FilterChip[] = ["All", ...MAX_COOKING_TIME.map(String)].map(
 );
 
 const sortOptions: SortOption[] = [
+  { value: "rating", label: "Top rated" },
   { value: "title", label: "Title (A-Z)" },
   { value: "cookingTime", label: "Fastest first" },
 ];
@@ -74,7 +75,9 @@ export function RecipesContent() {
       ? Number(urlMaxTime)
       : "All",
   );
-  const [sortBy, setSortBy] = useState<"title" | "cookingTime">("title");
+  const [sortBy, setSortBy] = useState<"title" | "cookingTime" | "rating">(
+    "title",
+  );
   const [panelOpen, setPanelOpen] = useState(false);
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(true);
@@ -179,6 +182,9 @@ export function RecipesContent() {
     });
 
     return [...filtered].sort((a, b) => {
+      if (sortBy === "rating") {
+        return (b.rating?.average ?? 0) - (a.rating?.average ?? 0);
+      }
       if (sortBy === "title") return a.title.localeCompare(b.title);
       return (a.cookingTime ?? Infinity) - (b.cookingTime ?? Infinity);
     });
@@ -250,7 +256,9 @@ export function RecipesContent() {
         <SortSelect
           options={sortOptions}
           value={sortBy}
-          onChange={(value) => setSortBy(value as "title" | "cookingTime")}
+          onChange={(value) =>
+            setSortBy(value as "title" | "cookingTime" | "rating")
+          }
         />
 
         <p className={styles.count}>

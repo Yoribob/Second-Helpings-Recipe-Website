@@ -18,6 +18,8 @@ model User {
   recipes       Recipe[]
   refreshTokens RefreshToken[]
   bookmarks     Bookmark[]
+  ratings       RecipeRating[]
+  comments      RecipeComment[]
 }
 
 model Recipe {
@@ -29,6 +31,8 @@ model Recipe {
   imageUrl    String?
   isGlobal    Boolean  @default(false)
   status      String   @default("draft")
+  ratingAvg   Float    @default(0)
+  ratingCount Int      @default(0)
   category    String?
   difficulty  String?
   cookingTime Int?
@@ -38,8 +42,40 @@ model Recipe {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  user        User?        @relation(fields: [userId], references: [id])
+  user        User?          @relation(fields: [userId], references: [id])
   ingredients Ingredient[]
+  ratings     RecipeRating[]
+  comments    RecipeComment[]
+}
+
+model RecipeRating {
+  id        String   @id @default(uuid())
+  recipeId  String
+  userId    String
+  value     Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  recipe Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, recipeId])
+  @@index([recipeId])
+}
+
+model RecipeComment {
+  id        String   @id @default(uuid())
+  recipeId  String
+  userId    String
+  text      String
+  rating    Int?
+  createdAt DateTime @default(now())
+
+  recipe Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, recipeId])
+  @@index([recipeId])
 }
 
 model Ingredient {

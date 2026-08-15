@@ -19,6 +19,9 @@ export function RecipeCard({ recipe }: RecipeCardProps) {
     .filter(Boolean)
     .join(" | ");
 
+  const rating = recipe.rating;
+  const showRating = !!rating && rating.count > 0;
+
   return (
     <article
       className={`${styles.card}${recipe.imageUrl ? "" : ` ${styles.noImage}`}`}
@@ -52,6 +55,27 @@ export function RecipeCard({ recipe }: RecipeCardProps) {
         )}
 
         {meta && <p className={styles.meta}>{meta}</p>}
+
+        {showRating && rating && (
+          <p className={styles.rating}>
+            <span className={styles.ratingStars} aria-hidden="true">
+              {[1, 2, 3, 4, 5].map((value) => (
+                <span
+                  key={value}
+                  className={
+                    value <= Math.round(rating.average)
+                      ? styles.starFilled
+                      : styles.starEmpty
+                  }
+                >
+                  ★
+                </span>
+              ))}
+            </span>
+            <span className={styles.ratingValue}>{rating.average.toFixed(1)}</span>
+            <span className={styles.ratingCount}>({rating.count})</span>
+          </p>
+        )}
 
         {(recipe.category || recipe.difficulty || recipe.cuisine) && (
           <div className={styles.chips}>

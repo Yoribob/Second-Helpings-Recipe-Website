@@ -9,7 +9,10 @@ const {
   createRecipe,
   updateRecipe,
   deleteRecipe,
-  getRecipeMetadata
+  getRecipeMetadata,
+  rateRecipe,
+  createComment,
+  deleteComment
 } = require('../controllers/recipeController')
 
 router.get('/metadata', getRecipeMetadata)
@@ -21,6 +24,12 @@ router.get('/global', getGlobalRecipes)
 router.get('/my', authMiddleware, getMyRecipes)
 
 router.get('/:id', authMiddleware.optionalAuth, getRecipeById)
+
+router.post('/:id/rating', authMiddleware, rateRecipe)
+
+router.post('/:id/comments', authMiddleware, createComment)
+
+router.delete('/:id/comments/:commentId', authMiddleware, deleteComment)
 
 router.post('/', authMiddleware, createRecipe)
 

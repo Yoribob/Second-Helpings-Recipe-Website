@@ -98,7 +98,13 @@ export function RecipeDetailView({
 
       <RecipeScaler recipe={recipe} />
 
-      <RatingSection />
+      {recipe.rating != null && (
+        <RatingSection
+          recipeId={recipe.id}
+          myRating={recipe.myRating ?? null}
+          comments={recipe.comments ?? []}
+        />
+      )}
     </div>
   );
 }
