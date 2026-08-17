@@ -1,0 +1,89 @@
+.delete {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border: 2px solid #c84b31;
+  border-radius: 999px;
+  background: transparent;
+  color: #c84b31;
+  font-size: 0.88rem;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+}
+
+.delete:hover,
+.delete:focus-visible {
+  background: #c84b31;
+  color: #fff;
+  outline: none;
+}
+
+.delete:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.confirmWrap {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 8px 12px;
+  border: 2px solid #c84b31;
+  border-radius: 12px;
+  background: #fbeae4;
+}
+
+.confirmText {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #7a2a18;
+}
+
+.confirmDelete,
+.cancel {
+  padding: 6px 14px;
+  border: none;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: filter 0.15s ease;
+}
+
+.confirmDelete {
+  background: #c84b31;
+  color: #fff;
+}
+
+.cancel {
+  background: #ede2cf;
+  color: var(--bay);
+}
+
+.confirmDelete:hover:not(:disabled),
+.confirmDelete:focus-visible,
+.cancel:hover:not(:disabled),
+.cancel:focus-visible {
+  filter: brightness(0.94);
+  outline: none;
+}
+
+.confirmDelete:disabled,
+.cancel:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.error {
+  width: 100%;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #96281b;
+}

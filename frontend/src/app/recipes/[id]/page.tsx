@@ -5,6 +5,7 @@ import { getServerSession } from "@/lib/auth-server";
 import type { Recipe } from "@/lib/types";
 import { RecipeDetailView } from "@/components/recipes/RecipeDetailView";
 import { PublishGlobalButton } from "@/components/recipes/PublishGlobalButton";
+import { DeleteRecipeButton } from "@/components/recipes/DeleteRecipeButton";
 
 export const dynamic = "force-dynamic";
 
@@ -46,16 +47,23 @@ export default async function RecipePage({
   const ownsRecipe =
     Boolean(userId) &&
     recipe.user != null &&
-    recipe.user.id === userId &&
-    !recipe.isGlobal;
+    recipe.user.id === userId;
 
   return (
     <RecipeDetailView
       recipe={recipe}
       backHref="/recipes"
+      readOnly={ownsRecipe}
       actions={
         ownsRecipe ? (
-          <PublishGlobalButton recipeId={recipe.id} status={recipe.status ?? "draft"} />
+          <>
+            <DeleteRecipeButton recipeId={recipe.id} />
+            <PublishGlobalButton
+              recipeId={recipe.id}
+              status={recipe.status ?? "draft"}
+              rejectedReason={recipe.rejectedReason ?? null}
+            />
+          </>
         ) : null
       }
     />
