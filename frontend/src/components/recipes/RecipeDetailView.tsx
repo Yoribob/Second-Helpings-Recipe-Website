@@ -12,6 +12,7 @@ type RecipeDetailViewProps = {
   backHref?: string;
   bookmarkable?: boolean;
   actions?: React.ReactNode;
+  readOnly?: boolean;
 };
 
 export function RecipeDetailView({
@@ -19,6 +20,7 @@ export function RecipeDetailView({
   backHref,
   bookmarkable = true,
   actions,
+  readOnly = false,
 }: RecipeDetailViewProps) {
   return (
     <div className={styles.main}>
@@ -103,6 +105,9 @@ export function RecipeDetailView({
           recipeId={recipe.id}
           myRating={recipe.myRating ?? null}
           comments={recipe.comments ?? []}
+          average={recipe.rating?.average ?? null}
+          count={recipe.rating?.count ?? null}
+          readOnly={readOnly}
         />
       )}
     </div>

@@ -25,22 +25,68 @@
   cursor: not-allowed;
 }
 
-.pending {
+.unpublish {
   display: inline-flex;
   align-items: center;
   gap: 8px;
   padding: 8px 14px;
-  border: 2px dashed var(--saffron);
+  border: 2px solid #c84b31;
   border-radius: 999px;
-  background: rgba(224, 166, 43, 0.12);
-  color: var(--saffron);
+  background: transparent;
+  color: #c84b31;
   font-size: 0.88rem;
   font-weight: 700;
   font-family: inherit;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+}
+
+.unpublish:hover,
+.unpublish:focus-visible {
+  background: #c84b31;
+  color: #fff;
+  outline: none;
+}
+
+.unpublish:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .error {
   font-size: 0.8rem;
   font-weight: 600;
   color: #96281b;
+}
+
+.rejected {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 12px 14px;
+  border: 2px solid #c84b31;
+  border-radius: 12px;
+  background: #fbeae4;
+}
+
+.rejectedBadge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: #c84b31;
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.rejectedReason {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: #7a2a18;
 }

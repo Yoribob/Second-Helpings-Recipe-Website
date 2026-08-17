@@ -7,7 +7,9 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon server.js",
     "db:studio": "prisma studio",
-    "db:migrate": "prisma migrate dev"
+    "db:migrate": "prisma migrate dev",
+    "db:admin": "node prisma/seed-admin.js",
+    "db:clean-self-ratings": "node scripts/clean-self-ratings.js"
   },
   "keywords": [],
   "author": "",

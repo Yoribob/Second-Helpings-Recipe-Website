@@ -317,10 +317,6 @@ async function createRecipe(req, res) {
       return res.status(400).json({ msg: 'Dietary tags must be an array' })
     }
 
-    if (isGlobal) {
-      return res.status(403).json({ msg: 'Recipes are published only after manual verification' })
-    }
-
     const recipe = await prisma.recipe.create({
       data: {
         userId: userId,
@@ -328,8 +324,8 @@ async function createRecipe(req, res) {
         description: description || null,
         steps,
         imageUrl: imageUrl || null,
-        isGlobal: false,
-        status: 'draft',
+        isGlobal: true,
+        status: 'published',
         category: category || null,
         difficulty: difficulty || null,
         cookingTime: cookingTime ? parseInt(cookingTime) : null,
@@ -421,21 +417,28 @@ async function updateRecipe(req, res) {
     }
     if (imageUrl !== undefined) updateData.imageUrl = imageUrl
 
-    if (isGlobal !== undefined && isGlobal === true) {
-      return res.status(403).json({ msg: 'Recipes are published only after manual verification' })
-    }
-
     if (status !== undefined) {
-      if (!['draft', 'pending', 'published'].includes(status)) {
-        return res.status(400).json({ msg: 'Status must be draft, pending, or published' })
+      if (!['draft', 'pending', 'published', 'rejected'].includes(status)) {
+        return res.status(400).json({ msg: 'Status must be draft, pending, published, or rejected' })
       }
-      if (status === 'published') {
-        return res.status(403).json({ msg: 'Recipes are published only after manual verification' })
+      if (status === 'rejected') {
+        return res.status(403).json({ msg: 'Only moderators can set this status' })
       }
+
       if (existingRecipe.isGlobal) {
-        return res.status(400).json({ msg: "You can't change the status of a public recipe" })
+        if (existingRecipe.userId === userId && status === 'draft') {
+          updateData.status = 'draft'
+          updateData.isGlobal = false
+        } else if (status === 'published') {
+          updateData.status = 'published'
+          updateData.isGlobal = true
+        } else {
+          return res.status(400).json({ msg: "You can't change the status of a public recipe" })
+        }
+      } else {
+        updateData.status = status
+        if (status === 'published') updateData.isGlobal = true
       }
-      updateData.status = status
     }
 
     if (category !== undefined) updateData.category = category
@@ -500,6 +503,10 @@ async function deleteRecipe(req, res) {
     if (existingRecipe.userId !== userId) {
       return res.status(403).json({ msg: 'You can only delete your own recipes' })
     }
+
+    await prisma.notification.deleteMany({
+      where: { recipeId: id }
+    })
 
     await prisma.recipe.delete({
       where: { id }
@@ -603,12 +610,23 @@ async function rateRecipe(req, res) {
     if (recipe.userId !== userId && !recipe.isGlobal) {
       return res.status(403).json({ msg: 'Access denied' })
     }
+    if (recipe.userId === userId) {
+      return res.status(400).json({ msg: "You can't rate your own recipe" })
+    }
+    if (!recipe.isGlobal) {
+      return res.status(400).json({ msg: 'You can only rate published recipes' })
+    }
 
     await prisma.$transaction(async (tx) => {
       await tx.recipeRating.upsert({
         where: { userId_recipeId: { userId, recipeId: id } },
         update: { value },
         create: { userId, recipeId: id, value }
+      })
+
+      await tx.recipeComment.updateMany({
+        where: { userId, recipeId: id },
+        data: { rating: value }
       })
 
       const agg = await tx.recipeRating.aggregate({

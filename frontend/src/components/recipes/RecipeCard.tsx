@@ -63,7 +63,7 @@ export function RecipeCard({ recipe }: RecipeCardProps) {
                 <span
                   key={value}
                   className={
-                    value <= Math.round(rating.average)
+                    value <= Math.ceil(rating.average)
                       ? styles.starFilled
                       : styles.starEmpty
                   }

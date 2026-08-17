@@ -12,6 +12,8 @@ const logoutRoutes = require('./routes/logoutRoutes')
 const userRoutes = require('./routes/userRoutes')
 const recipeRoutes = require('./routes/recipeRoutes')
 const bookmarkRoutes = require('./routes/bookmarkRoutes')
+const adminRoutes = require('./routes/adminRoutes')
+const notificationRoutes = require('./routes/notificationRoutes')
 const app = express()
 const server = http.createServer(app)
 const corsOriginFn = (origin, callback) => {
@@ -22,7 +24,7 @@ const corsOriginFn = (origin, callback) => {
   }
 }
 app.set('trust proxy',1)
-app.use(cors({origin:corsOriginFn, credentials:true, methods:['GET','POST','PUT','DELETE','OPTIONS'], allowedHeaders:['Content-Type','Authorization']}))
+app.use(cors({origin:corsOriginFn, credentials:true, methods:['GET','POST','PUT','PATCH','DELETE','OPTIONS'], allowedHeaders:['Content-Type','Authorization']}))
 app.use(express.json())
 app.use(cookieParser())
 app.use('/api/auth', authRoutes)
@@ -32,6 +34,8 @@ app.use('/api/logout', logoutRoutes)
 app.use('/api/user', userRoutes)
 app.use('/api/recipes', recipeRoutes)
 app.use('/api/bookmarks', bookmarkRoutes)
+app.use('/api/admin/recipes', adminRoutes)
+app.use('/api/notifications', notificationRoutes)
 ;(async () => {
   try {
     await prisma.$connect()

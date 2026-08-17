@@ -9,54 +9,116 @@ import styles from "./PublishGlobalButton.module.css";
 type PublishGlobalButtonProps = {
   recipeId: string;
   status?: RecipeStatus;
+  rejectedReason?: string | null;
 };
 
 export function PublishGlobalButton({
   recipeId,
   status,
+  rejectedReason,
 }: PublishGlobalButtonProps) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const pending = status === "pending";
+  const rejected = status === "rejected";
 
-  const handleClick = async () => {
+  const publish = async () => {
     if (busy) return;
     setBusy(true);
     setError(null);
     try {
-      await api.updateRecipe(recipeId, { status: "pending" });
+      await api.updateRecipe(recipeId, { status: "published" });
       router.refresh();
     } catch (err) {
       setError(
         err instanceof ApiError
           ? err.message
-          : "Couldn't submit this recipe for review",
+          : "Couldn't publish this recipe",
       );
+    } finally {
       setBusy(false);
     }
   };
 
-  if (pending) {
+  const unpublish = async () => {
+    if (busy) return;
+    setBusy(true);
+    setError(null);
+    try {
+      await api.updateRecipe(recipeId, { status: "draft" });
+      router.refresh();
+    } catch (err) {
+      setError(
+        err instanceof ApiError
+          ? err.message
+          : "Couldn't unpublish this recipe",
+      );
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  if (rejected) {
     return (
-      <span className={styles.pending}>
-        <svg
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          aria-hidden="true"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
+      <div className={styles.rejected}>
+        <span className={styles.rejectedBadge}>Rejected</span>
+        {rejectedReason && (
+          <p className={styles.rejectedReason}>{rejectedReason}</p>
+        )}
+        <button
+          type="button"
+          className={styles.button}
+          onClick={publish}
+          disabled={busy}
+          title="Make this recipe visible to everyone"
+          aria-label="Publish recipe"
         >
-          <circle cx="12" cy="12" r="10" />
-          <path d="M12 6v6l4 2" />
-        </svg>
-        Pending review
-      </span>
+          {busy ? "Publishing…" : "Submit again"}
+        </button>
+        {error && (
+          <span className={styles.error} role="alert">
+            {error}
+          </span>
+        )}
+      </div>
+    );
+  }
+
+  if (status === "published") {
+    return (
+      <>
+        <button
+          type="button"
+          className={styles.unpublish}
+          onClick={unpublish}
+          disabled={busy}
+          title="Remove this recipe from the public site"
+          aria-label="Unpublish recipe"
+        >
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" />
+            <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" />
+            <path d="M1 1l22 22" />
+          </svg>
+          {busy ? "Unpublishing…" : "Unpublish"}
+        </button>
+        {error && (
+          <span className={styles.error} role="alert">
+            {error}
+          </span>
+        )}
+      </>
     );
   }
 
@@ -65,10 +127,10 @@ export function PublishGlobalButton({
       <button
         type="button"
         className={styles.button}
-        onClick={handleClick}
+        onClick={publish}
         disabled={busy}
-        title="Submit this recipe for manual verification to make it visible to everyone"
-        aria-label="Submit recipe for public review"
+        title="Make this recipe visible to everyone"
+        aria-label="Publish recipe"
       >
         <svg
           width="16"
@@ -85,7 +147,7 @@ export function PublishGlobalButton({
           <path d="M2 12h20" />
           <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
         </svg>
-        {busy ? "Submitting…" : "Make public"}
+        {busy ? "Publishing…" : "Make public"}
       </button>
       {error && (
         <span className={styles.error} role="alert">

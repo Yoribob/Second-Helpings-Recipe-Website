@@ -28,6 +28,9 @@ type RatingSectionProps = {
   recipeId: string;
   myRating: number | null;
   comments: RecipeComment[];
+  average?: number | null;
+  count?: number | null;
+  readOnly?: boolean;
 };
 
 function formatDate(iso: string) {
@@ -56,6 +59,8 @@ export function RatingSection({
   recipeId,
   myRating,
   comments,
+  average,
+  readOnly = false,
 }: RatingSectionProps) {
   const router = useRouter();
   const pathname = usePathname() ?? "/";
@@ -144,56 +149,81 @@ export function RatingSection({
     <section className={styles.section}>
       <h2 className={styles.sectionTitle}>Rate this recipe</h2>
 
-      <div className={styles.picker} role="radiogroup" aria-label="Star rating">
-        {[...STARS].reverse().map((value) => (
-          <button
-            key={value}
-            type="button"
-            className={`${styles.pickerStar}${
-              value <= picked ? ` ${styles.pickerStarSelected}` : ""
-            }`}
-            aria-label={`${value} star${value === 1 ? "" : "s"}`}
-            disabled={savingRating}
-            onClick={() => handleRate(value)}
-          >
-            ★
-          </button>
-        ))}
-      </div>
+      {readOnly ? (
+        <div
+          className={styles.picker}
+          role="img"
+          aria-label={`${(average ?? 0).toFixed(1)} out of 5 stars average`}
+          style={{ pointerEvents: "none" }}
+        >
+          {[...STARS].reverse().map((value) => (
+            <span
+              key={value}
+              className={`${styles.pickerStar}${
+                value <= Math.ceil(average ?? 0)
+                  ? ` ${styles.pickerStarSelected}`
+                  : ""
+              }`}
+              aria-hidden="true"
+            >
+              ★
+            </span>
+          ))}
+        </div>
+      ) : (
+        <>
+          <div className={styles.picker} role="radiogroup" aria-label="Star rating">
+            {[...STARS].reverse().map((value) => (
+              <button
+                key={value}
+                type="button"
+                className={`${styles.pickerStar}${
+                  value <= picked ? ` ${styles.pickerStarSelected}` : ""
+                }`}
+                aria-label={`${value} star${value === 1 ? "" : "s"}`}
+                disabled={savingRating}
+                onClick={() => handleRate(value)}
+              >
+                ★
+              </button>
+            ))}
+          </div>
 
-      {ratingError && (
-        <p className={styles.error} role="alert">
-          {ratingError}
-        </p>
-      )}
-
-      {!ownComment && (
-        <div className={styles.form}>
-          <textarea
-            className={styles.textarea}
-            rows={4}
-            value={commentText}
-            onChange={(event) => setCommentText(event.target.value)}
-            placeholder="Share your thoughts on this recipe…"
-          />
-          <button
-            type="button"
-            className={styles.submit}
-            onClick={handlePostComment}
-            disabled={posting}
-          >
-            {posting
-              ? "Posting…"
-              : authenticated
-                ? "Post comment"
-                : "Log in to comment"}
-          </button>
-          {commentError && (
+          {ratingError && (
             <p className={styles.error} role="alert">
-              {commentError}
+              {ratingError}
             </p>
           )}
-        </div>
+
+          {!ownComment && (
+            <div className={styles.form}>
+              <textarea
+                className={styles.textarea}
+                rows={4}
+                value={commentText}
+                onChange={(event) => setCommentText(event.target.value)}
+                placeholder="Share your thoughts on this recipe…"
+              />
+              <button
+                type="button"
+                className={styles.submit}
+                onClick={handlePostComment}
+                disabled={posting}
+              >
+                {posting
+                  ? "Posting…"
+                  : authenticated
+                    ? "Post comment"
+                    : "Log in to comment"}
+              </button>
+              {commentError && (
+                <p className={styles.error} role="alert">
+                  {commentError}
+                </p>
+              )}
+            </div>
+          )}
+        </>
       )}
 
       <h3 className={styles.commentsTitle}>Comments</h3>

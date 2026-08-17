@@ -4,7 +4,7 @@ export interface RecipeUser {
     usernameOriginal: string
 }
 
-export type RecipeStatus = "draft" | "pending" | "published"
+export type RecipeStatus = "draft" | "pending" | "published" | "rejected"
 
 export interface RecipeRating {
     average: number,
@@ -34,6 +34,8 @@ export interface Recipe {
     imageUrl?: string | null,
     isGlobal: boolean,
     status?: RecipeStatus,
+    rejectedReason?: string | null,
+    madeByUser?: boolean,
     rating?: RecipeRating | null,
     myRating?: number | null,
     comments?: RecipeComment[],
@@ -44,7 +46,9 @@ export interface Recipe {
     cuisine?: string | null,
     dietaryTags: string[],
     ingredients: Ingredient[],
-    user?: RecipeUser | null
+    user?: RecipeUser | null,
+    createdAt?: string,
+    updatedAt?: string
 }
 
 export interface Ingredient {
@@ -75,6 +79,18 @@ export interface ApiUser {
     username: string,
     usernameOriginal: string,
     email: string,
+    role?: string,
+    createdAt: string
+}
+
+export type NotificationType = "rejected" | "approved"
+
+export interface AppNotification {
+    id: string
+    recipeId?: string | null
+    type: string
+    message: string
+    read: boolean
     createdAt: string
 }
 

@@ -13,6 +13,7 @@ model User {
   passwordHash     String
   username         String   @unique
   usernameOriginal String
+  role             String   @default("user")
   createdAt        DateTime @default(now())
 
   recipes       Recipe[]
@@ -20,6 +21,7 @@ model User {
   bookmarks     Bookmark[]
   ratings       RecipeRating[]
   comments      RecipeComment[]
+  notifications Notification[]
 }
 
 model Recipe {
@@ -41,6 +43,8 @@ model Recipe {
   dietaryTags String[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  rejectedReason String?
+  reviewedAt     DateTime?
 
   user        User?          @relation(fields: [userId], references: [id])
   ingredients Ingredient[]
@@ -109,4 +113,19 @@ model Bookmark {
 
   @@unique([userId, recipeId])
   @@index([userId])
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  recipeId  String?
+  type      String
+  message   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, read])
+  @@index([userId, createdAt])
 }

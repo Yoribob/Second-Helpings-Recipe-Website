@@ -83,6 +83,13 @@ export function AuthNav() {
         {open && (
           <div className={styles.dropdown} role="menu">
             <Link
+              href="/notifications"
+              className={styles.dropdownItem}
+              onClick={() => setOpen(false)}
+            >
+              Notifications
+            </Link>
+            <Link
               href="/bookmarks"
               className={styles.dropdownItem}
               onClick={() => setOpen(false)}
@@ -96,6 +103,15 @@ export function AuthNav() {
             >
               My recipes
             </Link>
+            {user.role === "admin" && (
+              <Link
+                href="/admin"
+                className={styles.dropdownItem}
+                onClick={() => setOpen(false)}
+              >
+                Moderation
+              </Link>
+            )}
             <div className={styles.divider} role="separator" />
             <button
               type="button"

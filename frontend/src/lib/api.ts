@@ -1,5 +1,6 @@
 import type {
   ApiUser,
+  AppNotification,
   NewRecipeInput,
   Recipe,
   RecipeComment,
@@ -163,6 +164,51 @@ export const api = {
     return request<{ msg: string; recipe: Recipe }>(
       `/api/recipes/${encodeURIComponent(id)}`,
       { method: "PUT", body: JSON.stringify(body) },
+    );
+  },
+
+  deleteRecipe(id: string) {
+    return request<{ msg: string }>(
+      `/api/recipes/${encodeURIComponent(id)}`,
+      { method: "DELETE" },
+    );
+  },
+
+  adminGetRecipes(status: string = "pending") {
+    return request<{ recipes: Recipe[] }>(
+      `/api/admin/recipes?status=${encodeURIComponent(status)}`,
+    );
+  },
+
+  adminApproveRecipe(id: string) {
+    return request<{ msg: string; recipe: Recipe }>(
+      `/api/admin/recipes/${encodeURIComponent(id)}/approve`,
+      { method: "PATCH" },
+    );
+  },
+
+  adminRejectRecipe(id: string, reason: string) {
+    return request<{ msg: string; recipe: Recipe }>(
+      `/api/admin/recipes/${encodeURIComponent(id)}/reject`,
+      { method: "PATCH", body: JSON.stringify({ reason }) },
+    );
+  },
+
+  adminUnpublishRecipe(id: string) {
+    return request<{ msg: string; recipe: Recipe }>(
+      `/api/admin/recipes/${encodeURIComponent(id)}/unpublish`,
+      { method: "PATCH" },
+    );
+  },
+
+  getNotifications() {
+    return request<{ notifications: AppNotification[] }>("/api/notifications");
+  },
+
+  markNotificationRead(id: string) {
+    return request<{ msg: string }>(
+      `/api/notifications/${encodeURIComponent(id)}/read`,
+      { method: "PATCH" },
     );
   },
 };
