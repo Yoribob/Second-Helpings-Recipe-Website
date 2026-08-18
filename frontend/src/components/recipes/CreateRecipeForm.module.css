@@ -326,6 +326,30 @@ select.input {
   outline: none;
 }
 
+.publish {
+  padding: 12px 22px;
+  border: none;
+  border-radius: 999px;
+  background: #2e7d32;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: filter 0.15s ease;
+}
+
+.publish:hover,
+.publish:focus-visible {
+  filter: brightness(0.94);
+  outline: none;
+}
+
+.publish:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .submit {
   padding: 12px 22px;
   border: none;

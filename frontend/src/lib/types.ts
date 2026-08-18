@@ -39,6 +39,7 @@ export interface Recipe {
     rating?: RecipeRating | null,
     myRating?: number | null,
     comments?: RecipeComment[],
+    pendingEdit?: RecipeEdit | null,
     category?: string | null,
     difficulty?: Difficulty | null,
     cookingTime?: number | null,
@@ -72,6 +73,31 @@ export interface NewRecipeInput {
     ingredients: Ingredient[]
 }
 
+export type RecipeEditStatus = "pending" | "approved" | "rejected"
+
+export interface RecipeEdit {
+    id: string
+    recipeId: string
+    userId: string
+    status: RecipeEditStatus
+    title: string
+    description?: string | null
+    steps: string[]
+    imageUrl?: string | null
+    category?: string | null
+    difficulty?: Difficulty | null
+    cookingTime?: number | null
+    servings?: number | null
+    cuisine?: string | null
+    dietaryTags: string[]
+    ingredients: Ingredient[]
+    rejectedReason?: string | null
+    createdAt?: string
+    reviewedAt?: string | null
+    recipe?: Recipe | null
+    user?: RecipeUser | null
+}
+
 export type Difficulty = "Easy" | "Medium" | "Hard"
 
 export interface ApiUser {
@@ -83,7 +109,7 @@ export interface ApiUser {
     createdAt: string
 }
 
-export type NotificationType = "rejected" | "approved"
+export type NotificationType = "rejected" | "approved" | "edit_approved" | "edit_rejected"
 
 export interface AppNotification {
     id: string

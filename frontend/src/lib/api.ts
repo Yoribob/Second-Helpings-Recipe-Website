@@ -4,6 +4,7 @@ import type {
   NewRecipeInput,
   Recipe,
   RecipeComment,
+  RecipeEdit,
   RecipeStatus,
 } from "@/lib/types";
 
@@ -198,6 +199,37 @@ export const api = {
     return request<{ msg: string; recipe: Recipe }>(
       `/api/admin/recipes/${encodeURIComponent(id)}/unpublish`,
       { method: "PATCH" },
+    );
+  },
+
+  submitRecipeEdit(id: string, body: NewRecipeInput) {
+    return request<{ msg: string; edit: RecipeEdit }>(
+      `/api/recipes/${encodeURIComponent(id)}/edits`,
+      { method: "POST", body: JSON.stringify(body) },
+    );
+  },
+
+  getPendingRecipeEdit(id: string) {
+    return request<{ edit: RecipeEdit | null }>(
+      `/api/recipes/${encodeURIComponent(id)}/edits/pending`,
+    );
+  },
+
+  adminGetPendingEdits() {
+    return request<{ edits: RecipeEdit[] }>("/api/admin/recipe-edits");
+  },
+
+  adminApproveEdit(id: string) {
+    return request<{ msg: string; edit: RecipeEdit }>(
+      `/api/admin/recipe-edits/${encodeURIComponent(id)}/approve`,
+      { method: "PATCH" },
+    );
+  },
+
+  adminRejectEdit(id: string, reason: string) {
+    return request<{ msg: string; edit: RecipeEdit }>(
+      `/api/admin/recipe-edits/${encodeURIComponent(id)}/reject`,
+      { method: "PATCH", body: JSON.stringify({ reason }) },
     );
   },
 

@@ -32,25 +32,38 @@ function parseIngredient(text: string): Ingredient | null {
   return { name, amount, unit };
 }
 
-export function CreateRecipeForm() {
+export function CreateRecipeForm({ recipe }: { recipe?: Recipe }) {
   const router = useRouter();
   const { status } = useAuth();
+  const isEditMode = Boolean(recipe);
+  const isPublishedLive =
+    isEditMode && recipe!.status === "published" && recipe!.isGlobal;
 
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [category, setCategory] = useState("");
-  const [difficulty, setDifficulty] = useState<Difficulty | "">("");
-  const [cookingTime, setCookingTime] = useState("");
-  const [cuisine, setCuisine] = useState("");
-  const [servings, setServings] = useState("");
-  const [dietaryTags, setDietaryTags] = useState<string[]>([]);
-  const [imageUrl, setImageUrl] = useState("");
+  const [title, setTitle] = useState(recipe?.title ?? "");
+  const [description, setDescription] = useState(recipe?.description ?? "");
+  const [category, setCategory] = useState(recipe?.category ?? "");
+  const [difficulty, setDifficulty] = useState<Difficulty | "">(
+    recipe?.difficulty ?? "",
+  );
+  const [cookingTime, setCookingTime] = useState(
+    recipe?.cookingTime != null ? String(recipe.cookingTime) : "",
+  );
+  const [cuisine, setCuisine] = useState(recipe?.cuisine ?? "");
+  const [servings, setServings] = useState(
+    recipe?.servings != null ? String(recipe.servings) : "",
+  );
+  const [dietaryTags, setDietaryTags] = useState<string[]>(
+    recipe?.dietaryTags ?? [],
+  );
+  const [imageUrl, setImageUrl] = useState(recipe?.imageUrl ?? "");
 
-  const [ingredients, setIngredients] = useState<Ingredient[]>([]);
+  const [ingredients, setIngredients] = useState<Ingredient[]>(
+    recipe?.ingredients ?? [],
+  );
   const [ingredientInput, setIngredientInput] = useState("");
   const [ingredientError, setIngredientError] = useState<string | null>(null);
 
-  const [steps, setSteps] = useState<string[]>([]);
+  const [steps, setSteps] = useState<string[]>(recipe?.steps ?? []);
   const [stepInput, setStepInput] = useState("");
   const [stepError, setStepError] = useState<string | null>(null);
 
@@ -60,9 +73,13 @@ export function CreateRecipeForm() {
 
   useEffect(() => {
     if (status === "anonymous") {
-      router.replace("/login?next=/recipes/create");
+      router.replace(
+        isEditMode
+          ? `/login?next=/recipes/${recipe!.id}/edit`
+          : "/login?next=/recipes/create",
+      );
     }
-  }, [status, router]);
+  }, [status, router, isEditMode, recipe]);
 
   useEffect(() => {
     if (!previewOpen) return;
@@ -161,21 +178,18 @@ export function CreateRecipeForm() {
     ],
   );
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setError(null);
-
+  const validate = (): NewRecipeInput | null => {
     if (!title.trim()) {
       setError("Title is required");
-      return;
+      return null;
     }
     if (ingredients.length === 0) {
       setError("Add at least one ingredient");
-      return;
+      return null;
     }
     if (steps.length === 0) {
       setError("Add at least one step");
-      return;
+      return null;
     }
 
     const cookingTimeNum = cookingTime.trim() ? Number(cookingTime) : undefined;
@@ -184,7 +198,7 @@ export function CreateRecipeForm() {
       (!Number.isFinite(cookingTimeNum) || cookingTimeNum < 1)
     ) {
       setError("Cooking time must be a positive number of minutes");
-      return;
+      return null;
     }
 
     const servingsNum = servings.trim() ? Number(servings) : undefined;
@@ -193,10 +207,10 @@ export function CreateRecipeForm() {
       (!Number.isFinite(servingsNum) || servingsNum < 1)
     ) {
       setError("Servings must be at least 1");
-      return;
+      return null;
     }
 
-    const payload: NewRecipeInput = {
+    return {
       title: title.trim(),
       description: description.trim() || null,
       steps,
@@ -210,12 +224,52 @@ export function CreateRecipeForm() {
       dietaryTags,
       ingredients,
     };
+  };
+
+  const goToRecipe = (id: string) => {
+    router.push(`/recipes/${id}`);
+    router.refresh();
+  };
+
+  const handleSaveChanges = async (
+    event: React.FormEvent<HTMLFormElement>,
+  ) => {
+    event.preventDefault();
+    setError(null);
+    const payload = validate();
+    if (!payload) return;
 
     setBusy(true);
     try {
-      const data = await api.createRecipe(payload);
-      router.push(`/recipes/${data.recipe.id}`);
-      router.refresh();
+      if (isEditMode) {
+        if (isPublishedLive) {
+          await api.updateRecipe(recipe!.id, { status: "draft" });
+        }
+        await api.updateRecipe(recipe!.id, payload);
+        goToRecipe(recipe!.id);
+      } else {
+        const data = await api.createRecipe(payload);
+        goToRecipe(data.recipe.id);
+      }
+    } catch (err) {
+      setError(
+        err instanceof ApiError
+          ? err.message
+          : "Something went wrong, please try again",
+      );
+      setBusy(false);
+    }
+  };
+
+  const handleSaveAndPublish = async () => {
+    setError(null);
+    const payload = validate();
+    if (!payload || !isEditMode) return;
+
+    setBusy(true);
+    try {
+      await api.submitRecipeEdit(recipe!.id, payload);
+      goToRecipe(recipe!.id);
     } catch (err) {
       setError(
         err instanceof ApiError
@@ -237,9 +291,15 @@ export function CreateRecipeForm() {
   return (
     <main className={styles.page}>
       <div className={styles.head}>
-        <h1 className={styles.title}>Add a recipe</h1>
+        <h1 className={styles.title}>
+          {isEditMode ? "Edit recipe" : "Add a recipe"}
+        </h1>
         <p className={styles.subtitle}>
-          Write it down once, keep it in your collection forever.
+          {isEditMode
+            ? isPublishedLive
+              ? "Save changes to keep this recipe private, or save edits and publish to send it for review."
+              : "Save your changes, or save edits and publish to send the recipe for review."
+            : "Write it down once, keep it in your collection forever."}
         </p>
       </div>
 
@@ -249,7 +309,7 @@ export function CreateRecipeForm() {
         </p>
       )}
 
-      <form className={styles.card} onSubmit={handleSubmit}>
+      <form className={styles.card} onSubmit={handleSaveChanges}>
         <section className={styles.section}>
           <h2 className={styles.sectionTitle}>Basics</h2>
 
@@ -518,8 +578,25 @@ export function CreateRecipeForm() {
           >
             Review
           </button>
+          {isEditMode && (
+            <button
+              type="button"
+              className={styles.publish}
+              onClick={handleSaveAndPublish}
+              disabled={busy}
+              title="Submit the changes for admin review before they go live"
+            >
+              {busy ? "Submitting…" : "Save edits and publish"}
+            </button>
+          )}
           <button type="submit" className={styles.submit} disabled={busy}>
-            {busy ? "Uploading…" : "Add to your recipes"}
+            {busy
+              ? isEditMode
+                ? "Saving…"
+                : "Uploading…"
+              : isEditMode
+                ? "Save changes"
+                : "Add to your recipes"}
           </button>
         </div>
       </form>
