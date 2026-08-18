@@ -1,19 +1,159 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { ApiError, api } from "@/lib/api";
 import { useAuth } from "@/lib/auth-context";
-import { formatDate } from "@/lib/format";
-import type { Recipe } from "@/lib/types";
+import { formatDate, formatMinutes } from "@/lib/format";
+import type { Ingredient, Recipe, RecipeEdit } from "@/lib/types";
 import { RecipeDetailView } from "@/components/recipes/RecipeDetailView";
 import styles from "./page.module.css";
 
 const TABS: { value: string; label: string }[] = [
   { value: "pending", label: "Pending" },
+  { value: "edits", label: "Edits" },
   { value: "rejected", label: "Rejected" },
   { value: "published", label: "Published" },
 ];
+
+function emptyLabel(active: string) {
+  if (active === "pending") return "recipes awaiting review";
+  if (active === "edits") return "recipe edits awaiting review";
+  return `${active} recipes`;
+}
+
+function EditComparison({ edit }: { edit: RecipeEdit }) {
+  const recipe = edit.recipe;
+  const str = (value: string | null | undefined) => (value ? value : "-");
+  const fmtList = (list?: string[]) =>
+    list && list.length ? list.join(", ") : "-";
+  const fmtIngredients = (list?: Ingredient[]) =>
+    list && list.length
+      ? list.map((item) => `${item.name} ${item.amount} ${item.unit}`).join(", ")
+      : "-";
+
+  const fields = [
+    { label: "Title", before: str(recipe?.title), after: str(edit.title) },
+    {
+      label: "Description",
+      before: str(recipe?.description),
+      after: str(edit.description),
+    },
+    {
+      label: "Category",
+      before: str(recipe?.category),
+      after: str(edit.category),
+    },
+    {
+      label: "Difficulty",
+      before: str(recipe?.difficulty),
+      after: str(edit.difficulty),
+    },
+    {
+      label: "Cooking time",
+      before: formatMinutes(recipe?.cookingTime) || "-",
+      after: formatMinutes(edit.cookingTime) || "-",
+    },
+    {
+      label: "Servings",
+      before: recipe?.servings ? String(recipe.servings) : "-",
+      after: edit.servings ? String(edit.servings) : "-",
+    },
+    { label: "Cuisine", before: str(recipe?.cuisine), after: str(edit.cuisine) },
+    {
+      label: "Dietary tags",
+      before: fmtList(recipe?.dietaryTags),
+      after: fmtList(edit.dietaryTags),
+    },
+    {
+      label: "Ingredients",
+      before: fmtIngredients(recipe?.ingredients),
+      after: fmtIngredients(edit.ingredients),
+    },
+    {
+      label: "Steps",
+      before: fmtList(recipe?.steps),
+      after: fmtList(edit.steps),
+    },
+  ];
+
+  const imageChanged = str(recipe?.imageUrl) !== str(edit.imageUrl);
+
+  const pane = (side: "before" | "after") => {
+    const imageUrl = side === "before" ? recipe?.imageUrl : edit.imageUrl;
+    const imageAlt =
+      side === "before" ? recipe?.title ?? "Recipe" : edit.title;
+
+    return (
+      <div className={styles.comparePane}>
+        <p className={styles.compareLabel}>
+          {side === "before" ? "Before" : "After"}
+        </p>
+
+        <div className={styles.compareImageRow}>
+          <span className={styles.compareField}>Image</span>
+          {imageUrl ? (
+            <div
+              className={
+                imageChanged
+                  ? `${styles.compareImageBox} ${styles.compareImageChanged}`
+                  : styles.compareImageBox
+              }
+            >
+              <Image
+                src={imageUrl}
+                alt={imageAlt}
+                fill
+                unoptimized
+                sizes="300px"
+              />
+            </div>
+          ) : (
+            <span
+              className={
+                imageChanged
+                  ? `${styles.compareNoImage} ${styles.compareNoImageChanged}`
+                  : styles.compareNoImage
+              }
+            >
+              No image
+            </span>
+          )}
+        </div>
+
+        <dl className={styles.compareList}>
+          {fields.map((field) => {
+            const changed = field.before !== field.after;
+            return (
+              <div key={field.label} className={styles.compareRow}>
+                <dt className={styles.compareField}>{field.label}</dt>
+                <dd
+                  className={
+                    changed
+                      ? `${styles.compareValue} ${styles.compareValueChanged}`
+                      : styles.compareValue
+                  }
+                >
+                  {field[side]}
+                </dd>
+              </div>
+            );
+          })}
+        </dl>
+      </div>
+    );
+  };
+
+  return (
+    <div className={styles.compare}>
+      <div className={styles.compareGrid}>
+        {pane("before")}
+        {pane("after")}
+      </div>
+    </div>
+  );
+}
 
 export function AdminQueue() {
   const router = useRouter();
@@ -21,6 +161,7 @@ export function AdminQueue() {
 
   const [active, setActive] = useState("pending");
   const [recipes, setRecipes] = useState<Recipe[]>([]);
+  const [edits, setEdits] = useState<RecipeEdit[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
 
@@ -30,6 +171,8 @@ export function AdminQueue() {
 
   const [busyId, setBusyId] = useState<string | null>(null);
   const [previewId, setPreviewId] = useState<string | null>(null);
+
+  const isEditsTab = active === "edits";
 
   const selectTab = (value: string) => {
     if (value === active) return;
@@ -51,17 +194,25 @@ export function AdminQueue() {
 
     let cancelled = false;
 
-    api
-      .adminGetRecipes(active)
+    const load = isEditsTab
+      ? api.adminGetPendingEdits()
+      : api.adminGetRecipes(active);
+
+    load
       .then((data) => {
-        if (!cancelled) setRecipes(data.recipes);
+        if (cancelled) return;
+        if (isEditsTab) {
+          setEdits((data as { edits: RecipeEdit[] }).edits);
+        } else {
+          setRecipes((data as { recipes: Recipe[] }).recipes);
+        }
       })
       .catch((err) => {
         if (!cancelled) {
           setLoadError(
             err instanceof ApiError
               ? err.message
-              : "Couldn't load the recipe queue",
+              : "Couldn't load the moderation queue",
           );
         }
       })
@@ -72,16 +223,24 @@ export function AdminQueue() {
     return () => {
       cancelled = true;
     };
-  }, [status, active, router]);
+  }, [status, active, isEditsTab, router]);
 
-  const runAction = async (action: () => Promise<unknown>, id: string) => {
+  const runAction = async (
+    action: () => Promise<unknown>,
+    id: string,
+  ) => {
     if (busyId) return;
     setBusyId(id);
     setLoadError(null);
     try {
       await action();
-      const data = await api.adminGetRecipes(active);
-      setRecipes(data.recipes);
+      if (isEditsTab) {
+        const data = await api.adminGetPendingEdits();
+        setEdits(data.edits);
+      } else {
+        const data = await api.adminGetRecipes(active);
+        setRecipes(data.recipes);
+      }
       router.refresh();
     } catch (err) {
       setLoadError(
@@ -95,8 +254,11 @@ export function AdminQueue() {
     }
   };
 
-  const approve = (id: string) =>
+  const approveRecipe = (id: string) =>
     runAction(() => api.adminApproveRecipe(id), id);
+
+  const approveEdit = (id: string) =>
+    runAction(() => api.adminApproveEdit(id), id);
 
   const unpublish = (id: string) =>
     runAction(() => api.adminUnpublishRecipe(id), id);
@@ -107,7 +269,10 @@ export function AdminQueue() {
       setReasonError("A rejection reason is required");
       return;
     }
-    runAction(() => api.adminRejectRecipe(id, text), id);
+    const action = isEditsTab
+      ? () => api.adminRejectEdit(id, text)
+      : () => api.adminRejectRecipe(id, text);
+    runAction(action, id);
   };
 
   if (status === "loading" || status === "anonymous") {
@@ -128,7 +293,7 @@ export function AdminQueue() {
         <h1 className={styles.title}>Moderation</h1>
       </div>
 
-      <div className={styles.tabs} role="tablist" aria-label="Recipe status">
+      <div className={styles.tabs} role="tablist" aria-label="Moderation queue">
         {TABS.map((tab) => (
           <button
             key={tab.value}
@@ -150,11 +315,119 @@ export function AdminQueue() {
       )}
 
       {loading ? (
-        <p className={styles.empty}>Loading recipes…</p>
+        <p className={styles.empty}>Loading…</p>
+      ) : isEditsTab ? (
+        edits.length === 0 ? (
+          <p className={styles.empty}>No recipe edits awaiting review.</p>
+        ) : (
+          <div className={styles.list}>
+            {edits.map((edit) => {
+              const isBusy = busyId === edit.id;
+              const isRejecting = rejectingId === edit.id;
+              const isCompareOpen = previewId === edit.id;
+              const author =
+                edit.user?.usernameOriginal ??
+                edit.recipe?.user?.usernameOriginal ??
+                "unknown";
+
+              return (
+                <article key={edit.id} className={styles.card}>
+                  <div className={styles.cardHeader}>
+                    <div className={styles.cardTitleRow}>
+                      <h2 className={styles.cardTitle}>{edit.title}</h2>
+                    </div>
+                    <p className={styles.cardMeta}>
+                      by {author} | {formatDate(edit.createdAt)}
+                    </p>
+{edit.description && (
+                    <p className={styles.cardDesc}>{edit.description}</p>
+                  )}
+                </div>
+
+                {isCompareOpen && <EditComparison edit={edit} />}
+
+                <div className={styles.actions}>
+                    <button
+                      type="button"
+                      className={styles.previewButton}
+                      onClick={() =>
+                        setPreviewId(isCompareOpen ? null : edit.id)
+                      }
+                    >
+                      {isCompareOpen ? "Hide comparison" : "Compare"}
+                    </button>
+                    {isRejecting ? (
+                      <div className={styles.rejectForm}>
+                        <input
+                          className={styles.rejectInput}
+                          type="text"
+                          value={reason}
+                          maxLength={500}
+                          onChange={(event) => {
+                            setReason(event.target.value);
+                            setReasonError(null);
+                          }}
+                          placeholder="Why are these changes being rejected?"
+                          aria-label="Rejection reason"
+                        />
+                        {reasonError && (
+                          <p className={styles.formError} role="alert">
+                            {reasonError}
+                          </p>
+                        )}
+                        <div className={styles.rejectActions}>
+                          <button
+                            type="button"
+                            className={styles.confirmReject}
+                            disabled={isBusy}
+                            onClick={() => submitReject(edit.id)}
+                          >
+                            {isBusy ? "Rejecting…" : "Confirm rejection"}
+                          </button>
+                          <button
+                            type="button"
+                            className={styles.cancel}
+                            disabled={isBusy}
+                            onClick={() => {
+                              setRejectingId(null);
+                              setReason("");
+                              setReasonError(null);
+                            }}
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <button
+                        type="button"
+                        className={styles.reject}
+                        disabled={isBusy}
+                        onClick={() => {
+                          setReason("");
+                          setReasonError(null);
+                          setRejectingId(edit.id);
+                        }}
+                      >
+                        Reject
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      className={styles.approve}
+                      disabled={isBusy}
+                      onClick={() => approveEdit(edit.id)}
+                    >
+                      {isBusy ? "Approving…" : "Approve"}
+                    </button>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        )
       ) : recipes.length === 0 ? (
-        <p className={styles.empty}>
-          No {active === "pending" ? "recipes awaiting review" : `${active} recipes`}.
-        </p>
+        <p className={styles.empty}>No {emptyLabel(active)}.</p>
       ) : (
         <div className={styles.list}>
           {recipes.map((recipe) => {
@@ -168,10 +441,10 @@ export function AdminQueue() {
                   <div className={styles.cardTitleRow}>
                     <h2 className={styles.cardTitle}>{recipe.title}</h2>
                   </div>
-                  <p className={styles.cardMeta}>
-                    by {recipe.user?.usernameOriginal ?? "unknown"}{" "}
-                    | submitted {formatDate(recipe.createdAt)}
-                  </p>
+<p className={styles.cardMeta}>
+                      by {recipe.user?.usernameOriginal ?? "unknown"}{" "}
+                      | {formatDate(recipe.createdAt)}
+                    </p>
                   {recipe.description && (
                     <p className={styles.cardDesc}>{recipe.description}</p>
                   )}
@@ -180,12 +453,6 @@ export function AdminQueue() {
                 {recipe.rejectedReason && (
                   <p className={styles.reason}>
                     <strong>Rejection reason:</strong> {recipe.rejectedReason}
-                  </p>
-                )}
-
-                {recipe.status === "rejected" && (
-                  <p className={styles.hint}>
-                    The author can resubmit this recipe for review.
                   </p>
                 )}
 
@@ -271,7 +538,7 @@ export function AdminQueue() {
                         type="button"
                         className={styles.approve}
                         disabled={isBusy}
-                        onClick={() => approve(recipe.id)}
+                        onClick={() => approveRecipe(recipe.id)}
                       >
                         {isBusy ? "Approving…" : "Approve"}
                       </button>

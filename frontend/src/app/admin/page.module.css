@@ -99,18 +99,117 @@
   font-size: 0.9rem;
 }
 
-.hint {
-  margin: 0 0 10px;
-  font-size: 0.85rem;
-  color: #7a7566;
-}
-
 .preview {
   margin: 12px 0;
   padding: 16px;
   border: 1px dashed #d9c39f;
   border-radius: 12px;
   background: #fff;
+}
+
+.compare {
+  margin: 12px 0;
+  padding: 16px;
+  border: 1px dashed #d9c39f;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.compareGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.comparePane {
+  min-width: 0;
+}
+
+.compareLabel {
+  margin: 0 0 8px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #7a7566;
+}
+
+.compareList {
+  margin: 0;
+}
+
+.compareRow {
+  display: grid;
+  grid-template-columns: 128px 1fr;
+  gap: 8px;
+  align-items: start;
+  padding: 6px 0;
+  border-bottom: 1px solid #f0e6d6;
+  font-size: 0.9rem;
+}
+
+.compareField {
+  margin: 0;
+  color: #7a7566;
+  font-weight: 600;
+}
+
+.compareValue {
+  margin: 0;
+  color: #4a5248;
+  word-break: break-word;
+}
+
+.compareValueChanged {
+  background: #fff1e0;
+  color: #b34700;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-weight: 600;
+}
+
+.compareImageRow {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  margin: 0 0 10px;
+}
+
+.compareImageBox {
+  position: relative;
+  width: 100%;
+  max-width: 300px;
+  aspect-ratio: 16 / 9;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid #e5d5c3;
+  background: #faf4e8;
+}
+
+.compareImageChanged {
+  border: 3px solid #ff9500;
+}
+
+.compareNoImage {
+  display: inline-block;
+  padding: 12px 14px;
+  border: 1px dashed #d9c39f;
+  border-radius: 10px;
+  color: #7a7566;
+  font-size: 0.9rem;
+}
+
+.compareNoImageChanged {
+  border-color: #ff9500;
+  color: #b34700;
+  font-weight: 600;
+}
+
+@media (max-width: 720px) {
+  .compareGrid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .actions {

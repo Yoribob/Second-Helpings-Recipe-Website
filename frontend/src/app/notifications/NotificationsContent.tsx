@@ -102,9 +102,9 @@ export function NotificationsContent() {
                   <span className={styles.message}>{item.message}</span>
                   <span className={styles.meta}>
                     {item.type === "rejected" ? "Rejected" : "Approved"}
-                    {" · "}
+                    {" | "}
                     {formatDate(item.createdAt)}
-                    {item.recipeId && " · View recipe"}
+                    {item.recipeId && " | View recipe"}
                   </span>
                 </span>
               </button>
