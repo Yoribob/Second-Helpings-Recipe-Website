@@ -35,6 +35,7 @@ app.use('/api/user', userRoutes)
 app.use('/api/recipes', recipeRoutes)
 app.use('/api/bookmarks', bookmarkRoutes)
 app.use('/api/admin/recipes', adminRoutes)
+app.use('/api/admin/recipe-edits', require('./routes/adminEditRoutes'))
 app.use('/api/notifications', notificationRoutes)
 ;(async () => {
   try {

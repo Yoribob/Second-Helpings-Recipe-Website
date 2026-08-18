@@ -14,6 +14,10 @@ const {
   createComment,
   deleteComment
 } = require('../controllers/recipeController')
+const {
+  submitRecipeEdit,
+  getPendingRecipeEdit
+} = require('../controllers/recipeEditController')
 
 router.get('/metadata', getRecipeMetadata)
 
@@ -22,6 +26,9 @@ router.get('/', getAllRecipes)
 router.get('/global', getGlobalRecipes)
 
 router.get('/my', authMiddleware, getMyRecipes)
+
+router.post('/:id/edits', authMiddleware, submitRecipeEdit)
+router.get('/:id/edits/pending', authMiddleware, getPendingRecipeEdit)
 
 router.get('/:id', authMiddleware.optionalAuth, getRecipeById)
 

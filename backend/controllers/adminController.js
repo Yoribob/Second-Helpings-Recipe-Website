@@ -30,6 +30,9 @@ async function getRecipesByStatus(req, res) {
 
     const where = { userId: { not: null } }
     if (status !== 'all') where.status = status
+    where.NOT = {
+      edits: { some: { status: 'pending' } }
+    }
 
     const recipes = await prisma.recipe.findMany({
       where,

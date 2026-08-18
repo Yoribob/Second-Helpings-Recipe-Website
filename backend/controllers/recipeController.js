@@ -216,7 +216,27 @@ async function getRecipeById(req, res) {
       mine: comment.userId === userId
     }))
 
-    res.json({ recipe: { ...serializeRecipe(recipe), myRating, comments } })
+    let pendingEdit = null
+    if (userId && recipe.userId === userId) {
+      const edit = await prisma.recipeEdit.findFirst({
+        where: { recipeId: id, status: 'pending' }
+      })
+      if (edit) {
+        pendingEdit = {
+          ...edit,
+          ingredients: Array.isArray(edit.ingredients) ? edit.ingredients : []
+        }
+      }
+    }
+
+    res.json({
+      recipe: {
+        ...serializeRecipe(recipe),
+        myRating,
+        comments,
+        pendingEdit
+      }
+    })
   } catch (err) {
     console.error('Get recipe by ID error:', err)
     res.status(500).json({ msg: 'Failed to fetch recipe' })
@@ -382,6 +402,27 @@ async function updateRecipe(req, res) {
 
     if (existingRecipe.userId !== userId) {
       return res.status(403).json({ msg: 'You can only update your own recipes' })
+    }
+
+    const isPublishedLive =
+      existingRecipe.status === 'published' && existingRecipe.isGlobal
+    const hasContentUpdate =
+      title !== undefined ||
+      description !== undefined ||
+      steps !== undefined ||
+      imageUrl !== undefined ||
+      ingredients !== undefined ||
+      category !== undefined ||
+      difficulty !== undefined ||
+      cookingTime !== undefined ||
+      servings !== undefined ||
+      cuisine !== undefined ||
+      dietaryTags !== undefined
+
+    if (isPublishedLive && hasContentUpdate) {
+      return res.status(400).json({
+        msg: 'Published recipes must be edited through the edit review flow'
+      })
     }
 
     if (difficulty !== undefined && !['Easy', 'Medium', 'Hard'].includes(difficulty)) {

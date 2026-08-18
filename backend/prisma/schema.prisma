@@ -22,6 +22,7 @@ model User {
   ratings       RecipeRating[]
   comments      RecipeComment[]
   notifications Notification[]
+  recipeEdits   RecipeEdit[]
 }
 
 model Recipe {
@@ -50,6 +51,7 @@ model Recipe {
   ingredients Ingredient[]
   ratings     RecipeRating[]
   comments    RecipeComment[]
+  edits       RecipeEdit[]
 }
 
 model RecipeRating {
@@ -128,4 +130,31 @@ model Notification {
 
   @@index([userId, read])
   @@index([userId, createdAt])
+}
+
+model RecipeEdit {
+  id             String   @id @default(uuid())
+  recipeId       String
+  userId         String
+  status         String   @default("pending")
+  title          String
+  description    String?
+  steps          String[]
+  imageUrl       String?
+  category       String?
+  difficulty     String?
+  cookingTime    Int?
+  servings       Int?
+  cuisine        String?
+  dietaryTags    String[]
+  ingredients    Json
+  rejectedReason String?
+  createdAt      DateTime @default(now())
+  reviewedAt     DateTime?
+
+  recipe Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([status])
+  @@index([recipeId])
 }
