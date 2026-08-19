@@ -1,0 +1,5 @@
+# Regenerable TheMealDB import preview (npm run db:mealdb -- --dry-run)
+prisma/mealdb-preview.json
+
+# Generated recipe JSON artifacts (npm run db:generate)
+prisma/generated/
