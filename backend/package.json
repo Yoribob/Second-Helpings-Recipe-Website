@@ -9,6 +9,9 @@
     "db:studio": "prisma studio",
     "db:migrate": "prisma migrate dev",
     "db:admin": "node prisma/seed-admin.js",
+    "db:mealdb": "node prisma/seed-mealdb.js",
+    "db:generate": "node scripts/generate-recipes.js",
+    "db:seed-generated": "node prisma/seed-generated.js",
     "db:clean-self-ratings": "node scripts/clean-self-ratings.js"
   },
   "keywords": [],
