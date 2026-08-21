@@ -1,7 +1,7 @@
-import Image from "next/image";
 import Link from "next/link";
 import { formatMinutes } from "@/lib/format";
 import type { Recipe } from "@/lib/types";
+import { RecipeImage } from "@/components/recipes/RecipeImage";
 import { RecipeScaler } from "@/components/recipes/RecipeScaler";
 import { RatingSection } from "@/components/recipes/RatingSection";
 import { BookmarkButton } from "@/components/recipes/BookmarkButton";
@@ -47,13 +47,12 @@ export function RecipeDetailView({
 
       {recipe.imageUrl && (
         <div className={styles.hero}>
-          <Image
+          <RecipeImage
             src={recipe.imageUrl}
             alt={recipe.title}
             fill
             priority
             sizes="(min-width: 940px) 940px, 100vw"
-            style={{ objectFit: "cover" }}
           />
         </div>
       )}

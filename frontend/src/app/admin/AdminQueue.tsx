@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Image from "next/image";
+import { RecipeImage } from "@/components/recipes/RecipeImage";
 import { useRouter } from "next/navigation";
 import { ApiError, api } from "@/lib/api";
 import { useAuth } from "@/lib/auth-context";
@@ -101,11 +101,10 @@ function EditComparison({ edit }: { edit: RecipeEdit }) {
                   : styles.compareImageBox
               }
             >
-              <Image
+              <RecipeImage
                 src={imageUrl}
                 alt={imageAlt}
                 fill
-                unoptimized
                 sizes="300px"
               />
             </div>
