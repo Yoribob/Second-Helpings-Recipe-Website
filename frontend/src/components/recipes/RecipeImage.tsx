@@ -44,7 +44,6 @@ export function RecipeImage({
   }
 
   return (
-    // Native img handles arbitrary user-provided URLs reliably (hotlinking, etc.).
     <img
       src={normalized}
       alt={alt}

@@ -16,8 +16,6 @@ async function fetchRecipe(id: string): Promise<Recipe | null> {
     );
     return data?.recipe ?? null;
   } catch (err) {
-    // A failed fetch (404 or access denied) just means "not found" here;
-    // the ownership check below guards the page.
     if (err instanceof ServerApiError) return null;
     return null;
   }

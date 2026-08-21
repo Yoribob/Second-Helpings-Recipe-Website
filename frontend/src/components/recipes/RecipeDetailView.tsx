@@ -31,17 +31,17 @@ export function RecipeDetailView({
       )}
 
       <div className={styles.headerRow}>
-        <div>
+        <div className={styles.titleRow}>
           <h1 className={styles.title}>{recipe.title}</h1>
-          {recipe.description && (
-            <p className={styles.description}>{recipe.description}</p>
+          {(bookmarkable || actions) && (
+            <div className={styles.headerActions}>
+              {actions}
+              {bookmarkable && <BookmarkButton recipeId={recipe.id} />}
+            </div>
           )}
         </div>
-        {(bookmarkable || actions) && (
-          <div className={styles.headerActions}>
-            {actions}
-            {bookmarkable && <BookmarkButton recipeId={recipe.id} />}
-          </div>
+        {recipe.description && (
+          <p className={styles.description}>{recipe.description}</p>
         )}
       </div>
 
