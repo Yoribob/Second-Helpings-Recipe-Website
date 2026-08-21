@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { RecipeCard } from "@/components/recipes/RecipeCard";
 import { api } from "@/lib/api";
@@ -52,6 +52,12 @@ const sortOptions: SortOption[] = [
   { value: "cookingTime", label: "Fastest first" },
 ];
 
+
+
+const PAGE_SIZE = 100;
+const INITIAL_VISIBLE = 24;
+const RENDER_BATCH = 24;
+
 export function RecipesContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -79,30 +85,98 @@ export function RecipesContent() {
     "title",
   );
   const [panelOpen, setPanelOpen] = useState(false);
+
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
+
+  
+  
+  const [visible, setVisible] = useState(INITIAL_VISIBLE);
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     let cancelled = false;
-    api
-      .getRecipes({ limit: "100" })
-      .then((data) => {
-        if (!cancelled) {
-          setRecipes(data.recipes);
-          setLoading(false);
+    const seen = new Set<string>();
+    const loaded: Recipe[] = [];
+
+    async function loadAll() {
+      let page = 1;
+      let total: number | null = null;
+
+      for (;;) {
+        if (cancelled) return;
+        let data;
+        try {
+          data = await api.getRecipes({
+            limit: String(PAGE_SIZE),
+            page: String(page),
+          });
+        } catch (err) {
+          
+          if (page === 1) throw err;
+          return;
         }
-      })
+        if (cancelled) return;
+
+        const list = data.recipes ?? [];
+        const fresh = list.filter((recipe) => !seen.has(recipe.id));
+        for (const recipe of fresh) {
+          seen.add(recipe.id);
+          loaded.push(recipe);
+        }
+        setRecipes([...loaded]);
+        setLoading(false);
+
+        const pagination = data.pagination as { total?: number } | null | undefined;
+        if (typeof pagination?.total === "number") total = pagination.total;
+
+        const finished =
+          list.length === 0 ||
+          fresh.length === 0 ||
+          page >= 200 ||
+          (total != null && seen.size >= total) ||
+          (total == null && list.length < PAGE_SIZE);
+        if (finished) return;
+
+        page++;
+        setLoadingMore(true);
+      }
+    }
+
+    loadAll()
       .catch(() => {
         if (!cancelled) {
           setLoadError(true);
           setLoading(false);
         }
+      })
+      .finally(() => {
+        if (!cancelled) setLoadingMore(false);
       });
+
     return () => {
       cancelled = true;
     };
   }, []);
+
+  
+  
+  const filterKey = [
+    query,
+    category,
+    difficulty,
+    cuisine,
+    dietaryTags.join(","),
+    maxCookingTime,
+    sortBy,
+  ].join("|");
+  const [prevFilterKey, setPrevFilterKey] = useState(filterKey);
+  if (prevFilterKey !== filterKey) {
+    setPrevFilterKey(filterKey);
+    setVisible(INITIAL_VISIBLE);
+  }
 
   const [prevSearchParams, setPrevSearchParams] = useState(searchParams);
 
@@ -200,6 +274,23 @@ export function RecipesContent() {
   ]);
 
   const count = sorted.length;
+  const shown = sorted.slice(0, Math.min(visible, sorted.length));
+
+  
+  useEffect(() => {
+    const el = sentinelRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) {
+          setVisible((value) => value + RENDER_BATCH);
+        }
+      },
+      { rootMargin: "800px" },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [sorted.length, loading, loadError]);
 
   return (
     <main className={styles.main}>
@@ -328,10 +419,23 @@ export function RecipesContent() {
         ) : sorted.length === 0 ? (
           <p>No matching recipes</p>
         ) : (
-          sorted.map((recipe) => (
+          shown.map((recipe) => (
             <RecipeCard key={recipe.id} recipe={recipe} />
           ))
         )}
+      </div>
+
+      <div ref={sentinelRef} className={styles.loadMore}>
+        {!loading &&
+          !loadError &&
+          sorted.length > 0 &&
+          (loadingMore ? (
+            <span>Loading more recipes…</span>
+          ) : shown.length < sorted.length ? (
+            <span>Keep scrolling for more recipes…</span>
+          ) : (
+            <span>You&apos;ve seen all {count} recipes</span>
+          ))}
       </div>
     </main>
   );
