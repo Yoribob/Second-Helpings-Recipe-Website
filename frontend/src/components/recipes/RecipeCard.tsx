@@ -1,8 +1,8 @@
-import Image from "next/image";
 import Link from "next/link";
 import styles from "@/components/recipes/RecipeCard.module.css";
 import type { Recipe } from "@/lib/types";
 import { formatMinutes } from "@/lib/format";
+import { RecipeImage } from "@/components/recipes/RecipeImage";
 import { BookmarkButton } from "@/components/recipes/BookmarkButton";
 
 type RecipeCardProps = {
@@ -28,13 +28,12 @@ export function RecipeCard({ recipe }: RecipeCardProps) {
     >
       {recipe.imageUrl && (
         <Link href={recipeUrl} className={styles.imageLink}>
-          <Image
+          <RecipeImage
             className={styles.image}
             src={recipe.imageUrl}
             alt={recipe.title}
             fill
             sizes="(min-width: 640px) 33vw, 100vw"
-            style={{ objectFit: "cover" }}
           />
         </Link>
       )}
