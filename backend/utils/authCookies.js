@@ -7,7 +7,7 @@ function serializeAuthCookie(name, value, maxAgeMs) {
   return cookie.serialize(name, value, {
     httpOnly: true,
     secure: true,
-    sameSite: "none",
+    sameSite: "lax",
     maxAge: Math.floor(maxAgeMs / 1000),
     path: "/",
   });
@@ -28,7 +28,7 @@ function clearAuthCookies(res) {
   const clearOpts = {
     httpOnly: true,
     secure: true,
-    sameSite: "none",
+    sameSite: "lax",
     maxAge: 0,
     path: "/",
   };
