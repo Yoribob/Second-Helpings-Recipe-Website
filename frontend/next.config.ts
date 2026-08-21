@@ -7,6 +7,7 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "images.unsplash.com" },
       { protocol: "https", hostname: "**" },
     ],
+    unoptimized: true,
   },
   turbopack: {
     root: path.join(__dirname),
