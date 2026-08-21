@@ -1,0 +1,66 @@
+.main {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 48px 24px 64px;
+}
+
+.back {
+  color: var(--bay);
+  opacity: 0.8;
+  text-decoration: none;
+  font-size: 0.95rem;
+}
+
+.back:hover,
+.back:focus-visible {
+  opacity: 1;
+  color: var(--saffron);
+}
+
+.title {
+  margin: 14px 0 4px;
+  font-size: 2rem;
+  color: var(--bay);
+}
+
+.updated {
+  margin: 0 0 32px;
+  color: #7a7566;
+  font-size: 0.85rem;
+}
+
+.section {
+  margin-bottom: 28px;
+}
+
+.sectionTitle {
+  margin: 0 0 8px;
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  color: var(--bay);
+}
+
+.section p {
+  margin: 0 0 10px;
+  line-height: 1.6;
+}
+
+.list {
+  margin: 0 0 10px;
+  padding-left: 22px;
+}
+
+.list li {
+  margin-bottom: 6px;
+  line-height: 1.6;
+}
+
+.link {
+  color: var(--bay);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.link:hover {
+  color: var(--saffron);
+}
