@@ -11,7 +11,7 @@
 
 .footerTop {
   display: grid;
-  grid-template-columns: 1.5fr 1fr 1fr;
+  grid-template-columns: 1.6fr 1fr 1fr 1fr 0.9fr;
   gap: 40px;
   padding-bottom: 28px;
 }
@@ -41,6 +41,14 @@
 .brandName {
   font-family: var(--font-display);
   font-size: 1.2rem;
+  color: var(--saffron);
+}
+
+.columnTitle {
+  margin: 0 0 12px;
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 600;
   color: var(--saffron);
 }
 
@@ -74,6 +82,21 @@
   font-size: 0.8rem;
   color: var(--sage);
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.credits a {
+  color: var(--saffron);
+  text-decoration: none;
+}
+
+.credits a:hover,
+.credits a:focus-visible {
+  text-decoration: underline;
+  outline: none;
 }
 
 @media (max-width: 640px) {
