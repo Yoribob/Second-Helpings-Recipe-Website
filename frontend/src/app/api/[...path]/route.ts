@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
+export const runtime = "nodejs";
+
 function getBackendUrl(): string {
   return (process.env.API_URL ?? "http://localhost:3000").replace(/\/$/, "");
 }
@@ -16,6 +18,38 @@ const hopByHopHeaders = new Set([
   "host",
 ]);
 
+const strippedResponseHeaders = new Set([
+  ...hopByHopHeaders,
+  "content-encoding",
+  "content-length",
+]);
+
+function buildProxyResponseHeaders(backendRes: Response): Headers {
+  const headers = new Headers();
+
+  backendRes.headers.forEach((value, key) => {
+    const lower = key.toLowerCase();
+    if (strippedResponseHeaders.has(lower) || lower === "set-cookie") return;
+    headers.set(key, value);
+  });
+
+  const setCookies =
+    typeof backendRes.headers.getSetCookie === "function"
+      ? backendRes.headers.getSetCookie()
+      : [];
+
+  if (setCookies.length > 0) {
+    for (const cookie of setCookies) {
+      headers.append("set-cookie", cookie);
+    }
+  } else {
+    const single = backendRes.headers.get("set-cookie");
+    if (single) headers.append("set-cookie", single);
+  }
+
+  return headers;
+}
+
 async function proxyRequest(
   request: NextRequest,
   pathSegments: string[],
@@ -24,9 +58,9 @@ async function proxyRequest(
 
   const headers = new Headers();
   request.headers.forEach((value, key) => {
-    if (!hopByHopHeaders.has(key.toLowerCase())) {
-      headers.set(key, value);
-    }
+    const lower = key.toLowerCase();
+    if (hopByHopHeaders.has(lower) || lower === "accept-encoding") return;
+    headers.set(key, value);
   });
 
   const init: RequestInit = {
@@ -43,23 +77,15 @@ async function proxyRequest(
   try {
     backendRes = await fetch(url, init);
   } catch {
-    return NextResponse.json(
-      { msg: "Backend unavailable" },
-      { status: 502 },
-    );
+    return NextResponse.json({ msg: "Backend unavailable" }, { status: 502 });
   }
 
-  const responseHeaders = new Headers();
-  backendRes.headers.forEach((value, key) => {
-    if (!hopByHopHeaders.has(key.toLowerCase())) {
-      responseHeaders.append(key, value);
-    }
-  });
+  const body = await backendRes.arrayBuffer();
 
-  return new NextResponse(backendRes.body, {
+  return new NextResponse(body, {
     status: backendRes.status,
     statusText: backendRes.statusText,
-    headers: responseHeaders,
+    headers: buildProxyResponseHeaders(backendRes),
   });
 }
 
