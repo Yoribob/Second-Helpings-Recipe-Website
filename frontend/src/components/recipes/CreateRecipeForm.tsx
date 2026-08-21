@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { ApiError, api } from "@/lib/api";
+import { normalizeImageUrl } from "@/lib/normalize-image-url";
 import { useAuth } from "@/lib/auth-context";
 import {
   CATEGORIES,
@@ -18,6 +18,7 @@ import type {
   Recipe,
 } from "@/lib/types";
 import { RecipeDetailView } from "@/components/recipes/RecipeDetailView";
+import { RecipeImage } from "@/components/recipes/RecipeImage";
 import styles from "./CreateRecipeForm.module.css";
 
 const INGREDIENT_PATTERN = /^(.+?)\s+(\d+(?:[.,]\d+)?)\s*([a-zA-Z%]+)$/;
@@ -152,7 +153,7 @@ export function CreateRecipeForm({ recipe }: { recipe?: Recipe }) {
       title: title.trim() || "Untitled recipe",
       description: description.trim() || null,
       steps,
-      imageUrl: imageUrl.trim() || null,
+      imageUrl: normalizeImageUrl(imageUrl) || null,
       isGlobal: false,
       category: category || null,
       difficulty: difficulty || null,
@@ -214,7 +215,7 @@ export function CreateRecipeForm({ recipe }: { recipe?: Recipe }) {
       title: title.trim(),
       description: description.trim() || null,
       steps,
-      imageUrl: imageUrl.trim() || null,
+      imageUrl: normalizeImageUrl(imageUrl) || null,
       isGlobal: false,
       category: category || null,
       difficulty: difficulty || null,
@@ -446,13 +447,12 @@ export function CreateRecipeForm({ recipe }: { recipe?: Recipe }) {
                 placeholder="https://…"
               />
               {imageUrl.trim() && (
-                <Image
+                <RecipeImage
                   className={styles.imagePreview}
-                  src={imageUrl.trim()}
+                  src={imageUrl}
                   alt="Recipe image preview"
                   width={120}
                   height={80}
-                  unoptimized
                 />
               )}
             </div>
