@@ -1,6 +1,9 @@
 import { cookies } from "next/headers";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000";
+const API_BASE =
+  process.env.API_URL ??
+  process.env.NEXT_PUBLIC_API_URL ??
+  "http://localhost:3000";
 
 export class ServerApiError extends Error {
   status: number;
