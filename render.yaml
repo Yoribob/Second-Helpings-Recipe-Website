@@ -1,0 +1,36 @@
+services:
+  - type: web
+    name: second-helpings-api
+    runtime: node
+    plan: free
+    rootDir: backend
+    buildCommand: npm ci && npx prisma generate
+    startCommand: npx prisma migrate deploy && npm start
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: second-helpings-db
+          property: connectionString
+      - key: NODE_ENV
+        value: production
+      - key: JWT_ACCESS_SECRET
+        generateValue: true
+      - key: JWT_REFRESH_SECRET
+        generateValue: true
+
+  - type: web
+    name: second-helpings-frontend
+    runtime: node
+    plan: free
+    rootDir: frontend
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    envVars:
+      - key: API_URL
+        value: http://second-helpings-api:10000
+
+databases:
+  - name: second-helpings-db
+    plan: free
+    databaseName: recipe_app
+    user: recipe_app
