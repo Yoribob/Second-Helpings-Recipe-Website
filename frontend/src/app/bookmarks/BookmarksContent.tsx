@@ -17,18 +17,28 @@ export function BookmarksContent() {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
 
   useEffect(() => {
-    if (status !== "authenticated") return;
+    if (status !== "authenticated" || !ready) return;
     let cancelled = false;
-    api
-      .getRecipes({ limit: "100" })
-      .then((data) => {
-        if (!cancelled) setRecipes(data.recipes);
-      })
-      .catch(() => {});
+
+    Promise.all(
+      bookmarkedIds.map((id) =>
+        api
+          .getRecipe(id)
+          .then(({ recipe }) => recipe)
+          .catch(() => null),
+      ),
+    ).then((savedRecipes) => {
+      if (!cancelled) {
+        setRecipes(
+          savedRecipes.filter((recipe): recipe is Recipe => Boolean(recipe)),
+        );
+      }
+    });
+
     return () => {
       cancelled = true;
     };
-  }, [status]);
+  }, [bookmarkedIds, ready, status]);
 
   useEffect(() => {
     if (status === "anonymous") router.replace("/login?next=/bookmarks");

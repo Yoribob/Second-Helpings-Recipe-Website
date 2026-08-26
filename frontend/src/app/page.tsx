@@ -17,7 +17,7 @@ export default async function Home() {
   let recipes: Recipe[] = [];
   try {
     const data = await serverGetJson<{ recipes: Recipe[] }>(
-      "/api/recipes?limit=100",
+      "/api/recipes?limit=100&sortBy=rating&sortOrder=desc",
     );
     recipes = data?.recipes ?? [];
   } catch {
@@ -26,7 +26,7 @@ export default async function Home() {
 
   const trending = recipes.slice(0, 4);
   const slides = recipes
-    .filter((recipe) => recipe.imageUrl)
+    .filter((recipe) => recipe.imageUrl?.trim())
     .slice(0, 4)
     .map((recipe) => ({
       src: recipe.imageUrl as string,

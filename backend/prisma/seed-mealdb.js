@@ -114,7 +114,7 @@ function stripDerived(recipe) {
 
   if (skipped.length) {
     console.log('Skipped:')
-    skipped.slice(0, 15).forEach((s) => console.log(`  - ${s.id} ${s.title || '(no title)'} — ${s.reason}`))
+    skipped.slice(0, 15).forEach((s) => console.log(`  - ${s.id} ${s.title || '(no title)'} - ${s.reason}`))
     if (skipped.length > 15) console.log(`  … and ${skipped.length - 15} more`)
   }
 
@@ -173,7 +173,7 @@ function stripDerived(recipe) {
       warnings.push({ id: recipe.id, message: err.message })
     }
 
-    if (args.verbose) console.log(`  [${i + 1}/${normalized.length}] ${recipe.id} — ${recipe.title}`)
+    if (args.verbose) console.log(`  [${i + 1}/${normalized.length}] ${recipe.id} - ${recipe.title}`)
     else if ((i + 1) % 100 === 0) console.log(`  processed ${i + 1}/${normalized.length}…`)
   }
 
@@ -181,7 +181,7 @@ function stripDerived(recipe) {
   console.log(`Done. Created ${created}, updated ${updated}, errors ${errors}. Total recipes in DB: ${total}.`)
   if (warnings.length) {
     console.log('Errors:')
-    warnings.slice(0, 10).forEach((w) => console.log(`  - ${w.id} — ${w.message}`))
+    warnings.slice(0, 10).forEach((w) => console.log(`  - ${w.id} - ${w.message}`))
   }
 })().then(
   () => prisma.$disconnect(),

@@ -407,7 +407,7 @@ async function seedRecipes(recipes) {
   }
 
   if (args.inspect) {
-    console.log('\n(plan only — re-run without --inspect to generate)')
+    console.log('\n(plan only - re-run without --inspect to generate)')
     return
   }
 

@@ -34,7 +34,7 @@ function loadFiles(files) {
     for (const r of list) {
       const check = validateRecipe(r)
       if (!check.ok) {
-        console.warn(`skip invalid in ${file}: ${r && r.title} — ${check.errors.join('; ')}`)
+        console.warn(`skip invalid in ${file}: ${r && r.title} - ${check.errors.join('; ')}`)
         continue
       }
       if (!r.id) throw new Error(`recipe missing id in ${file}: ${r.title}`)
