@@ -2,9 +2,11 @@ const express = require("express");
 const http = require("http");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
-require("dotenv").config();
+if (process.env.NODE_ENV !== "production") {
+  require("dotenv").config();
+}
 const prisma = require("./config/prismaClient");
-const baseUrl = require("./config/baseUrl");
+const { configureSecrets } = require("./utils/jwt");
 const authRoutes = require("./routes/authRoutes");
 const regRoutes = require("./routes/regRoutes");
 const refreshRoutes = require("./routes/refreshRoutes");
@@ -20,11 +22,16 @@ const server = http.createServer(app);
 
 app.set("trust proxy", true);
 
-const allowedOrigins = new Set(
-  [process.env.ORIGIN, process.env.FRONTEND_URL]
-    .filter(Boolean)
-    .map((origin) => origin.replace(/\/$/, "")),
-);
+let allowedOrigins = new Set();
+
+function configureRuntime(env = process.env) {
+  allowedOrigins = new Set(
+    [env.ORIGIN, env.FRONTEND_URL]
+      .filter(Boolean)
+      .map((origin) => origin.replace(/\/$/, "")),
+  );
+  configureSecrets(env.JWT_ACCESS_SECRET, env.JWT_REFRESH_SECRET);
+}
 
 app.use(
   cors({
@@ -61,13 +68,24 @@ app.use("/api/admin/recipes", adminRoutes);
 app.use("/api/admin/recipe-edits", require("./routes/adminEditRoutes"));
 app.use("/api/notifications", notificationRoutes);
 
-(async () => {
+async function start() {
   try {
-    await prisma.$connect();
+    configureRuntime(process.env);
+    await prisma.initialize(process.env.DATABASE_URL);
     const PORT = process.env.PORT || 3000;
-    server.listen(PORT, () => console.log(`Server running on ${baseUrl}`));
+    server.listen(PORT, () => console.log(`Server listening on port ${PORT}`));
   } catch (err) {
     console.error("Failed to start server:", err);
-    process.exit(1);
+    process.exitCode = 1;
   }
-})();
+}
+
+if (require.main === module) {
+  start();
+}
+
+module.exports = {
+  server,
+  configureRuntime,
+  initializeDatabase: prisma.initialize,
+};

@@ -7,6 +7,9 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js",
     "dev": "nodemon server.js",
+    "worker:build": "prisma generate",
+    "worker:dev": "npm run worker:build && wrangler dev",
+    "worker:deploy": "npm run worker:build && wrangler deploy",
     "db:studio": "prisma studio",
     "db:migrate": "prisma migrate dev",
     "db:admin": "node prisma/seed-admin.js",
@@ -19,16 +22,20 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@prisma/adapter-pg": "^6.19.3",
     "@prisma/client": "^6.19.3",
-    "bcrypt": "^6.0.0",
+    "bcryptjs": "^3.0.2",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
+    "pg": "^8.16.3",
     "prisma": "^6.19.3"
   },
   "devDependencies": {
     "@types/node": "^26.1.2",
-    "nodemon": "^3.1.14"
+    "@types/pg": "^8.15.5",
+    "nodemon": "^3.1.14",
+    "wrangler": "^4.155.0"
   }
 }

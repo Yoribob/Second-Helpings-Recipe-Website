@@ -1,3 +1,5 @@
+/.dev.vars*
+
 # Regenerable TheMealDB import preview (npm run db:mealdb -- --dry-run)
 prisma/mealdb-preview.json
 
