@@ -88,4 +88,5 @@ module.exports = {
   server,
   configureRuntime,
   initializeDatabase: prisma.initialize,
+  withDatabaseClient: prisma.withClient,
 };
