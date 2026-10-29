@@ -10,7 +10,6 @@ let client = process.env.DATABASE_URL
   ? createClient(process.env.DATABASE_URL)
   : null;
 let clientConnectionString = process.env.DATABASE_URL || null;
-let connected = false;
 
 async function initialize(connectionString = process.env.DATABASE_URL) {
   if (!connectionString) {
@@ -22,11 +21,6 @@ async function initialize(connectionString = process.env.DATABASE_URL) {
     clientConnectionString = connectionString;
   } else if (clientConnectionString !== connectionString) {
     throw new Error("Prisma client was initialized for a different database");
-  }
-
-  if (!connected) {
-    await client.$connect();
-    connected = true;
   }
 }
 

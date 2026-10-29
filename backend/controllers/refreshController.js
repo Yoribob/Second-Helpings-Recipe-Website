@@ -1,3 +1,4 @@
+const jwt = require("jsonwebtoken");
 const {
   verifyRefreshToken,
   signAccessToken,
@@ -13,13 +14,6 @@ async function refreshAccessToken(req, res) {
     if (!token) return res.status(401).json({ msg: "No refresh token provided" });
 
     const payload = verifyRefreshToken(token);
-    const storedToken = await prisma.refreshToken.findUnique({
-      where: { userId: payload.userId },
-    });
-    if (!storedToken || storedToken.token !== token) {
-      return res.status(401).json({ msg: "Invalid or expired refresh token" });
-    }
-
     const newAccessToken = signAccessToken({
       userId: payload.userId,
       username: payload.username,
@@ -31,8 +25,8 @@ async function refreshAccessToken(req, res) {
       usernameOriginal: payload.usernameOriginal,
     });
 
-    await prisma.refreshToken.update({
-      where: { userId: payload.userId },
+    const rotation = await prisma.refreshToken.updateMany({
+      where: { userId: payload.userId, token },
       data: {
         token: newRefreshToken,
         createdAt: new Date(),
@@ -41,10 +35,19 @@ async function refreshAccessToken(req, res) {
       },
     });
 
+    if (rotation.count !== 1) {
+      return res.status(401).json({ msg: "Invalid or expired refresh token" });
+    }
+
     setAuthCookies(res, newAccessToken, newRefreshToken);
     res.json({ msg: "Tokens refreshed" });
-  } catch {
-    return res.status(401).json({ msg: "Invalid or expired refresh token" });
+  } catch (error) {
+    if (error instanceof jwt.JsonWebTokenError) {
+      return res.status(401).json({ msg: "Invalid or expired refresh token" });
+    }
+
+    console.error("Failed to refresh auth token:", error);
+    return res.status(500).json({ msg: "Unable to refresh token" });
   }
 }
 
